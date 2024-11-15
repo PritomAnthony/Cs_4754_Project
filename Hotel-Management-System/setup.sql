@@ -11,26 +11,27 @@ DROP Table IF EXISTS Customer;
 DROP Table IF EXISTS Address;
 
 CREATE Table Address (
-    postalCode CHAR(6) PRIMARY KEY,
-    city VARCHAR(20) NOT NULL,
-    province VARCHAR(20) NOT NULL,
-    street VARCHAR(20) NOT NULL
+	addressID INT AUTO_INCREMENT PRIMARY KEY,
+    postalCode CHAR(7),
+    city VARCHAR(50) NOT NULL,
+    province VARCHAR(50) NOT NULL,
+    street VARCHAR(50) NOT NULL
 );
 
 CREATE Table Customer (
     customerID INT PRIMARY KEY,
     firstName CHAR(20) NOT NULL,
     lastName CHAR(20) NOT NULL,
-    postalCode CHAR(6) NOT NULL,
+    addressID INT NOT NULL,
     loyaltyPts INT,
-    FOREIGN KEY(postalCode) REFERENCES Address(postalCode)
+    FOREIGN KEY (addressID) REFERENCES Address(addressID)
 );
 
 CREATE Table Hotel (
     hotelNumber INT PRIMARY KEY,
     hotelName VARCHAR(100) NOT NULL,
-    postalCode CHAR(6) NOT NULL,
-    FOREIGN KEY(postalCode) REFERENCES Address(postalCode)
+    addressID INT NOT NULL,
+    FOREIGN KEY (addressID) REFERENCES Address(addressID)
 );
 
 CREATE Table RoomCategory (
@@ -39,18 +40,20 @@ CREATE Table RoomCategory (
     price decimal(10, 2) NOT NULL
 );
 
-CREATE Table HotelRoom (
+CREATE TABLE HotelRoom (
     roomNumber INT,
     hotelNumber INT,
     available BOOLEAN NOT NULL,
     categoryNumber INT NOT NULL,
-    PRIMARY KEY(roomNumber, hotelNumber),
-    FOREIGN KEY(hotelNumber) REFERENCES Hotel(hotelNumber)
+    PRIMARY KEY (roomNumber, hotelNumber),
+    FOREIGN KEY (hotelNumber) REFERENCES Hotel(hotelNumber),
+    FOREIGN KEY (categoryNumber) REFERENCES RoomCategory(categoryNumber)
 );
 
 CREATE Table Booking (
     bookingNumber INT PRIMARY KEY,
     customerID INT NOT NULL,
+    hotelNumber INT NOT NULL,
     roomNumber INT NOT NULL,
     paymentType VARCHAR(20),
     checkInDate DATE NOT NULL,
@@ -58,7 +61,7 @@ CREATE Table Booking (
     checkedOut BOOLEAN,
     roomCost DECIMAL(10,2),
     FOREIGN KEY(customerID) REFERENCES Customer(customerID),
-    FOREIGN KEY(roomNumber) REFERENCES HotelRoom(roomNumber)
+    FOREIGN KEY(hotelNumber, roomNumber) REFERENCES HotelRoom(hotelNumber, roomNumber)
 );
 
 CREATE Table Employee (
@@ -77,3 +80,78 @@ CREATE Table FoodOrder (
     orderDate DATETIME NOT NULL,
     FOREIGN KEY(bookingNumber) REFERENCES Booking(bookingNumber)
 );
+
+
+-- !!!!!!! IMPORTING CSV FILES INSTRUCTIONS !!!!!!!
+-- Run this 
+SHOW VARIABLES LIKE 'secure_file_priv';
+-- It will show you a folder name like this -> C:\ProgramData\MySQL\MySQL Server 8.0\Uploads\
+-- You need to add the csv files to this folder and use this folder address in the code below (in the LOAD DATA INFILE part)
+-- Make sure to add an extra backslash in front of the one there because you need to escape them or something
+-- NOT C:\ProgramData\MySQL\MySQL Server 8.0\Uploads\
+-- NEED THIS C:\\ProgramData\\MySQL\\MySQL Server 8.0\\Uploads\\
+
+LOAD DATA INFILE 'C:\\ProgramData\\MySQL\\MySQL Server 8.0\\Uploads\\address_final.csv'
+INTO TABLE Address
+FIELDS TERMINATED BY ',' 
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 LINES
+(postalCode, city, province, street);  -- Skip the header row
+
+
+LOAD DATA INFILE 'C:\\ProgramData\\MySQL\\MySQL Server 8.0\\Uploads\\customers.csv'
+INTO TABLE Customer
+FIELDS TERMINATED BY ',' 
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 LINES;  -- Skip the header row
+
+LOAD DATA INFILE 'C:\\ProgramData\\MySQL\\MySQL Server 8.0\\Uploads\\hotels.csv'
+INTO TABLE Hotel
+FIELDS TERMINATED BY ',' 
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 LINES;  -- Skip the header row
+
+LOAD DATA INFILE 'C:\\ProgramData\\MySQL\\MySQL Server 8.0\\Uploads\\roomcategories.csv'
+INTO TABLE RoomCategory
+FIELDS TERMINATED BY ',' 
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 LINES;  -- Skip the header row
+
+LOAD DATA INFILE 'C:\\ProgramData\\MySQL\\MySQL Server 8.0\\Uploads\\hotel_rooms.csv'
+INTO TABLE HotelRoom
+FIELDS TERMINATED BY ',' 
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 LINES
+(roomNumber, hotelNumber, @available, categoryNumber)
+SET available = CASE
+    WHEN @available = 'True' THEN 1
+    WHEN @available = 'False' THEN 0
+    ELSE NULL
+END;  -- Skip the header row
+
+LOAD DATA INFILE 'C:\\ProgramData\\MySQL\\MySQL Server 8.0\\Uploads\\bookings.csv'
+INTO TABLE Booking
+FIELDS TERMINATED BY ',' 
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 LINES
+(bookingNumber, customerID, roomNumber, paymentType, checkInDate, checkOutDate, @checkedOut, roomCost)
+SET checkedOut = CASE
+    WHEN @checkedOut = 'True' THEN 1
+    WHEN @checkedOut = 'False' THEN 0
+    ELSE NULL
+END;  -- Skip the header row
+
+-- EMPLOYEE GOES HERE
+
+LOAD DATA INFILE 'C:\\ProgramData\\MySQL\\MySQL Server 8.0\\Uploads\\food_orders.csv'
+INTO TABLE FoodOrder
+FIELDS TERMINATED BY ',' 
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 LINES;  -- Skip the header row
