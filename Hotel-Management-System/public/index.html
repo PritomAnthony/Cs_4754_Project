@@ -7,10 +7,24 @@
     <div>
         <h3>Click the button below to see the list of the hotels we service.</h3>
         <button id="hotels-btn">List of hotels</button>
-        <div id="hotel-list">
-            
-        </div>
+        <button id="clear-btn">Clear</button>
+        <div id="hotel-list"></div>
+    </div>
+    <div>
+        <h3>Top 5 hotels based on number of bookings:</h3>
+        <div id="top-hotels-list"></div>
     </div>
 
     <script src="scripts/hotel.js"></script>
+    <script src="scripts/tophotels.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const clearButton = document.getElementById('clear-btn');
+            const hotelListDiv = document.getElementById('hotel-list');
+
+            clearButton.addEventListener('click', () => {
+                hotelListDiv.innerHTML = '';
+            });
+        });
+    </script>
 </body>

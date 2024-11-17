@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const list = document.createElement('ul');
                     hotels.forEach(hotel => {
                         const listItem = document.createElement('li');
-                        listItem.textContent = `${hotel.hotelName} - ${hotel.postalCode}`;
+                        listItem.textContent = `${hotel.hotelName}`;
                         list.appendChild(listItem);
                     });
                     hotelListDiv.appendChild(list);
