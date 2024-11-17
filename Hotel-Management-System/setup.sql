@@ -164,13 +164,13 @@ IGNORE 1 LINES;  -- Skip the header row
 /*
 CODE TO CREATE USERS (does not need to be executed again):
 
-create role read_only_user;
-grant select, show view, create view on hotelmanagement.* to read_only_user;
-create user 'read' identified by 'abcd1234' default role read_only_user;
+create role read_role;
+grant select, show view on hotelmanagement.* to read_role;
+create user 'read_user' identified by 'abcd1234' default role read_role;
 
-create role data_writer;
-grant select, insert, update, delete on hotelmanagement.* to data_writer;
-create user 'data' identified by 'abcd1234' default role data_writer;
+create role write_role;
+grant select, insert, update, delete on hotelmanagement.* to write_role;
+create user 'write_user' identified by 'abcd1234' default role write_role;
 
 create role admin_user;
 grant all privileges on hotelmanagement.* to admin_user;
