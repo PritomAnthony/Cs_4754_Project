@@ -91,23 +91,23 @@ SHOW VARIABLES LIKE 'secure_file_priv';
 -- NOT C:\ProgramData\MySQL\MySQL Server 8.0\Uploads\
 -- NEED THIS C:\\ProgramData\\MySQL\\MySQL Server 8.0\\Uploads\\
 
-LOAD DATA INFILE 'C:\\ProgramData\\MySQL\\MySQL Server 8.0\\Uploads\\address_final.csv'
+LOAD DATA INFILE 'C:\\ProgramData\\MySQL\\MySQL Server 8.0\\Uploads\\updated_address.csv'
 INTO TABLE Address
 FIELDS TERMINATED BY ',' 
 ENCLOSED BY '"'
 LINES TERMINATED BY '\n'
 IGNORE 1 LINES
-(postalCode, city, province, street);  -- Skip the header row
+(addressID, postalCode, city, province, street);  -- Skip the header row
 
 
-LOAD DATA INFILE 'C:\\ProgramData\\MySQL\\MySQL Server 8.0\\Uploads\\customers.csv'
+LOAD DATA INFILE 'C:\\ProgramData\\MySQL\\MySQL Server 8.0\\Uploads\\updated_customers.csv'
 INTO TABLE Customer
 FIELDS TERMINATED BY ',' 
 ENCLOSED BY '"'
 LINES TERMINATED BY '\n'
 IGNORE 1 LINES;  -- Skip the header row
 
-LOAD DATA INFILE 'C:\\ProgramData\\MySQL\\MySQL Server 8.0\\Uploads\\hotels.csv'
+LOAD DATA INFILE 'C:\\ProgramData\\MySQL\\MySQL Server 8.0\\Uploads\\updated_hotels.csv'
 INTO TABLE Hotel
 FIELDS TERMINATED BY ',' 
 ENCLOSED BY '"'
@@ -140,14 +140,19 @@ FIELDS TERMINATED BY ','
 ENCLOSED BY '"'
 LINES TERMINATED BY '\n'
 IGNORE 1 LINES
-(bookingNumber, customerID, roomNumber, paymentType, checkInDate, checkOutDate, @checkedOut, roomCost)
+(bookingNumber, customerID, hotelNumber, roomNumber, paymentType, checkInDate, checkOutDate, @checkedOut, roomCost)
 SET checkedOut = CASE
     WHEN @checkedOut = 'True' THEN 1
     WHEN @checkedOut = 'False' THEN 0
     ELSE NULL
 END;  -- Skip the header row
 
--- EMPLOYEE GOES HERE
+LOAD DATA INFILE 'C:\\ProgramData\\MySQL\\MySQL Server 8.0\\Uploads\\updated_employees.csv'
+INTO TABLE Employee
+FIELDS TERMINATED BY ',' 
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 LINES;  -- Skip the header row
 
 LOAD DATA INFILE 'C:\\ProgramData\\MySQL\\MySQL Server 8.0\\Uploads\\food_orders.csv'
 INTO TABLE FoodOrder
@@ -155,3 +160,20 @@ FIELDS TERMINATED BY ','
 ENCLOSED BY '"'
 LINES TERMINATED BY '\n'
 IGNORE 1 LINES;  -- Skip the header row
+
+/*
+CODE TO CREATE USERS (does not need to be executed again):
+
+create role read_only_user;
+grant select, show view, create view on hotelmanagement.* to read_only_user;
+create user 'read' identified by 'abcd1234' default role read_only_user;
+
+create role data_writer;
+grant select, insert, update, delete on hotelmanagement.* to data_writer;
+create user 'data' identified by 'abcd1234' default role data_writer;
+
+create role admin_user;
+grant all privileges on hotelmanagement.* to admin_user;
+create user 'admin' identified by 'abcd1234' default role admin_user;
+*/
+
