@@ -14,6 +14,15 @@
         <h3>Top 5 hotels based on number of bookings:</h3>
         <div id="top-hotels-list"></div>
     </div>
+    <div id="create-booking">
+        <h3>Create a booking:</h3>
+        <label for="check-in-date">Check in date:</label>
+        <input type="date" id="check-in-date">
+        <label for="check-out-date">Check out date:</label>
+        <input type="date" id="check-out-date">
+        <label for="hotel-number">Hotel number (from list above):</label>
+        <input id="hotel-number">
+    </div>
 
     <script src="scripts/hotel.js"></script>
     <script src="scripts/tophotels.js"></script>
@@ -26,5 +35,9 @@
                 hotelListDiv.innerHTML = '';
             });
         });
+
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('check-in-date').setAttribute('min', today);
+        document.getElementById('check-out-date').setAttribute('min', today);
     </script>
 </body>

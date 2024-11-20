@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 hotelListDiv.innerHTML = '';
 
                 if (hotels.length > 0) {
-                    const list = document.createElement('ul');
+                    const list = document.createElement('ol');
                     hotels.forEach(hotel => {
                         const listItem = document.createElement('li');
                         listItem.textContent = `${hotel.hotelName}`;
