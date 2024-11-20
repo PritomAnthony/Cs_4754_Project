@@ -81,6 +81,64 @@ CREATE Table FoodOrder (
     FOREIGN KEY(bookingNumber) REFERENCES Booking(bookingNumber)
 );
 
+-- ################  Triggers  ##################
+
+DELIMITER $$
+CREATE TRIGGER update_room_availability_after_booking
+AFTER INSERT ON Booking
+FOR EACH ROW
+BEGIN
+    -- Check if the newly inserted booking has checkedOut = False (i.e., checkedOut = 0)
+    IF NEW.checkedOut = 0 THEN
+        UPDATE hotelroom
+        SET available = 0
+        WHERE hotelNumber = NEW.hotelNumber
+          AND roomNumber = NEW.roomNumber;
+    END IF;
+END $$
+DELIMITER ;
+
+
+-- Trigger to check before booking is a room is available
+DELIMITER $$
+CREATE TRIGGER before_booking_insert
+BEFORE INSERT ON Booking
+FOR EACH ROW
+BEGIN
+    DECLARE room_status INT;
+    SELECT available INTO room_status
+    FROM HotelRoom
+    WHERE roomNumber = NEW.roomNumber AND hotelNumber = NEW.hotelNumber;
+
+    -- If the room is not available, throw an error
+    IF room_status = 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Room is not available for booking.';
+    END IF;
+END$$
+DELIMITER ;
+
+ -- Triger to update room availibity
+ DELIMITER $$
+CREATE TRIGGER update_room_availability_after_checkout
+AFTER UPDATE ON booking
+FOR EACH ROW
+BEGIN
+    -- Check if the 'checkedOut' column has changed from 0 to 1
+    IF OLD.checkedOut = 0 AND NEW.checkedOut = 1 THEN
+        UPDATE hotelroom
+        SET available = 1  
+        WHERE hotelNumber = NEW.hotelNumber
+          AND roomNumber = NEW.roomNumber;
+    END IF;
+END $$
+DELIMITER ;
+
+/* UPDATE booking
+SET checkedOut = 1
+WHERE bookingNumber = 719; */ 
+
+
 
 -- !!!!!!! IMPORTING CSV FILES INSTRUCTIONS !!!!!!!
 -- Run this 
@@ -161,19 +219,65 @@ ENCLOSED BY '"'
 LINES TERMINATED BY '\n'
 IGNORE 1 LINES;  -- Skip the header row
 
+-- ###########  Indexes and testing query ##############
+ 
+ 
+CREATE INDEX idx_city_province ON Address(city, province);
+CREATE INDEX idx_postal_code ON Address(postalCode);
+
+/* 
+SELECT addressID, postalCode, street
+FROM Address
+WHERE city = 'South Barbara' AND province = 'Prince Edward Island';
+*/
+
+/* 
+SELECT addressID, city, province, street
+FROM Address
+WHERE postalCode = 'P1S 7Y4';
+*/
+
+CREATE INDEX idx_name ON Customer(firstName, lastName);
+/* 
+SELECT * 
+FROM Customer 
+WHERE firstName = 'Stacey' AND lastName = 'Nelson';
+*/
+
+CREATE INDEX idx_customer_hotel_room_checkIn ON Booking(hotelNumber, roomNumber, checkInDate);
+/* 
+SELECT bookingNumber, customerID, checkOutDate, roomCost
+FROM Booking
+WHERE hotelNumber = 17
+  AND roomNumber = 1644
+  AND checkInDate >= '2024-05-06'
+ORDER BY checkInDate;
+*/
+
 /*
-CODE TO CREATE USERS (does not need to be executed again):
+SELECT bookingNumber,roomNumber, HotelNumber, checkInDate, checkOutDate, roomCost
+FROM Booking
+WHERE customerID = 781728
+ORDER BY checkInDate;
+ */
+ 
+ CREATE INDEX idx_name ON Employee(firstName, lastName);
+ 
+ CREATE INDEX idx_name ON FoodOrder(orderDate);
 
-create role read_role;
-grant select, show view on hotelmanagement.* to read_role;
-create user 'read_user' identified by 'abcd1234' default role read_role;
+/*
+-- CODE TO CREATE USERS (does not need to be executed again):
 
-create role write_role;
-grant select, insert, update, delete on hotelmanagement.* to write_role;
-create user 'write_user' identified by 'abcd1234' default role write_role;
+CREATE ROLE read_role;
+GRANT SELECT, SHOW VIEW ON hotelmanagement.* TO read_role;
+CREATE USER IF NOT EXISTS 'read_user' IDENTIFIED BY 'abcd1234' DEFAULT ROLE read_role;
 
-create role admin_user;
-grant all privileges on hotelmanagement.* to admin_user;
-create user 'admin' identified by 'abcd1234' default role admin_user;
+CREATE ROLE write_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON hotelmanagement.* TO write_role;
+CREATE USER 'write_user' IDENTIFIED BY 'abcd1234' DEFAULT ROLE write_role;
+
+CREATE ROLE admin_user;
+GRANT ALL ON hotelmanagement.* TO admin_user;
+CREATE USER 'admin' IDENTIFIED BY 'abcd1234' DEFAULT ROLE admin_user;
 */
 
