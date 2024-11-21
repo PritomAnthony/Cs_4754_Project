@@ -279,33 +279,46 @@ BEGIN
         SET MESSAGE_TEXT = 'Transaction failed. Changes rolled back.';
     END;
 
-    -- Start transaction
+    SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;
     START TRANSACTION;
 
-    -- Insert a new booking without specifying bookingNumber (AUTO_INCREMENT will handle it)
-    INSERT INTO Booking (
-        customerID, hotelNumber, roomNumber, paymentType, 
-        checkInDate, checkOutDate, checkedOut, roomCost
-    )
-    VALUES (
-        p_customerID, p_hotelNumber, p_roomNumber, p_paymentType, 
-        p_checkInDate, p_checkOutDate, p_checkedOut, p_roomCost
-    );
+    SELECT available 
+    FROM HotelRoom
+    WHERE hotelNumber = p_hotelNumber AND roomNumber = p_roomNumber
+    FOR UPDATE;
 
-    -- Update the room availability to 0 (booked)
-    UPDATE HotelRoom
-    SET available = 0
-    WHERE hotelNumber = p_hotelNumber AND roomNumber = p_roomNumber;
+    -- check if the room is available
+    IF (SELECT available 
+        FROM HotelRoom 
+        WHERE hotelNumber = p_hotelNumber AND roomNumber = p_roomNumber) = 0 THEN
+        ROLLBACK;
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Room is not available for booking.';
+    ELSE
+        -- Insert a new booking
+        INSERT INTO Booking (
+            customerID, hotelNumber, roomNumber, paymentType, 
+            checkInDate, checkOutDate, checkedOut, roomCost
+        )
+        VALUES (
+            p_customerID, p_hotelNumber, p_roomNumber, p_paymentType, 
+            p_checkInDate, p_checkOutDate, p_checkedOut, p_roomCost
+        );
 
-    -- Commit the transaction
+        -- Update the room availability to 0 (booked)
+        UPDATE HotelRoom
+        SET available = 0
+        WHERE hotelNumber = p_hotelNumber AND roomNumber = p_roomNumber;
+    END IF;
+
     COMMIT;
 
     -- Optionally, return the new bookingNumber (auto-generated)
     SELECT LAST_INSERT_ID() AS bookingNumber;
 
 END$$
-
 DELIMITER ;
+
 
 
 CALL AddBooking(
