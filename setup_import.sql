@@ -53,7 +53,7 @@ CREATE TABLE HotelRoom (
 );
 
 CREATE Table Booking (
-    bookingNumber INT PRIMARY KEY,
+    bookingNumber INT AUTO_INCREMENT PRIMARY KEY,
     customerID INT NOT NULL,
     hotelNumber INT NOT NULL,
     roomNumber INT NOT NULL,
@@ -84,64 +84,6 @@ CREATE Table FoodOrder (
     orderDate DATE NOT NULL,
     FOREIGN KEY(bookingNumber) REFERENCES Booking(bookingNumber)
 );
-
-
--- ################  Triggers  ##################
-
-DELIMITER $$
-CREATE TRIGGER update_room_availability_after_booking
-AFTER INSERT ON Booking
-FOR EACH ROW
-BEGIN
-    -- Check if the newly inserted booking has checkedOut = False (i.e., checkedOut = 0)
-    IF NEW.checkedOut = 0 THEN
-        UPDATE hotelroom
-        SET available = 0
-        WHERE hotelNumber = NEW.hotelNumber
-          AND roomNumber = NEW.roomNumber;
-    END IF;
-END $$
-DELIMITER ;
-
-
--- Trigger to check before booking is a room is available
-DELIMITER $$
-CREATE TRIGGER before_booking_insert
-BEFORE INSERT ON Booking
-FOR EACH ROW
-BEGIN
-    DECLARE room_status INT;
-    SELECT available INTO room_status
-    FROM HotelRoom
-    WHERE roomNumber = NEW.roomNumber AND hotelNumber = NEW.hotelNumber;
-
-    -- If the room is not available, throw an error
-    IF room_status = 0 THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Room is not available for booking.';
-    END IF;
-END$$
-DELIMITER ;
-
- -- Triger to update room availibity
- DELIMITER $$
-CREATE TRIGGER update_room_availability_after_checkout
-AFTER UPDATE ON booking
-FOR EACH ROW
-BEGIN
-    -- Check if the 'checkedOut' column has changed from 0 to 1
-    IF OLD.checkedOut = 0 AND NEW.checkedOut = 1 THEN
-        UPDATE hotelroom
-        SET available = 1  
-        WHERE hotelNumber = NEW.hotelNumber
-          AND roomNumber = NEW.roomNumber;
-    END IF;
-END $$
-DELIMITER ;
-
-/* UPDATE booking
-SET checkedOut = 1
-WHERE bookingNumber = 719; */ 
 
 
 
@@ -204,12 +146,13 @@ FIELDS TERMINATED BY ','
 ENCLOSED BY '"'
 LINES TERMINATED BY '\n'
 IGNORE 1 LINES
-(bookingNumber, customerID, hotelNumber, roomNumber, paymentType, checkInDate, checkOutDate, @checkedOut, roomCost)
+(customerID, hotelNumber, roomNumber, paymentType, checkInDate, checkOutDate, @checkedOut, roomCost)
 SET checkedOut = CASE
     WHEN @checkedOut = 'True' THEN 1
     WHEN @checkedOut = 'False' THEN 0
     ELSE NULL
-END;  -- Skip the header row
+END;
+
 
 -- EMPLOYEE GOES HERE
 LOAD DATA INFILE 'C:\\ProgramData\\MySQL\\MySQL Server 8.0\\Uploads\\employees.csv'
@@ -231,8 +174,7 @@ IGNORE 1 LINES
 
 
  - ###########  Indexes and testing query ##############
- 
- 
+
 CREATE INDEX idx_city_province ON Address(city, province);
 CREATE INDEX idx_postal_code ON Address(postalCode);
 
@@ -273,5 +215,108 @@ ORDER BY checkInDate;
  */
  
  CREATE INDEX idx_name ON Employee(firstName, lastName);
- 
  CREATE INDEX idx_name ON FoodOrder(orderDate);
+ 
+ 
+ -- ################  Triggers  ##################
+ 
+-- Trigger to check before booking is a room is available
+DELIMITER $$
+CREATE TRIGGER before_booking_insert
+BEFORE INSERT ON Booking
+FOR EACH ROW
+BEGIN
+    DECLARE room_status INT;
+    SELECT available INTO room_status
+    FROM HotelRoom
+    WHERE roomNumber = NEW.roomNumber AND hotelNumber = NEW.hotelNumber;
+
+    -- If the room is not available, throw an error
+    IF room_status = 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Room is not available for booking.';
+    END IF;
+END$$
+DELIMITER ;
+
+ -- Triger to update room availibity
+ DELIMITER $$
+CREATE TRIGGER update_room_availability_after_checkout
+AFTER UPDATE ON booking
+FOR EACH ROW
+BEGIN
+    -- Check if the 'checkedOut' column has changed from 0 to 1
+    IF OLD.checkedOut = 0 AND NEW.checkedOut = 1 THEN
+        UPDATE hotelroom
+        SET available = 1  
+        WHERE hotelNumber = NEW.hotelNumber
+          AND roomNumber = NEW.roomNumber;
+    END IF;
+END $$
+DELIMITER ;
+
+
+-- ################ Transaction #################
+-- stored procedure using transaction to add new booking
+
+DELIMITER $$
+CREATE PROCEDURE AddBooking(
+    IN p_customerID INT,
+    IN p_hotelNumber INT,
+    IN p_roomNumber INT,
+    IN p_paymentType VARCHAR(20),
+    IN p_checkInDate DATE,
+    IN p_checkOutDate DATE,
+    IN p_checkedOut BOOLEAN,
+    IN p_roomCost DECIMAL(10, 2)
+)
+BEGIN
+    -- Declare variables for error handling
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        -- Rollback transaction if any error occurs
+        ROLLBACK;
+        SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = 'Transaction failed. Changes rolled back.';
+    END;
+
+    -- Start transaction
+    START TRANSACTION;
+
+    -- Insert a new booking without specifying bookingNumber (AUTO_INCREMENT will handle it)
+    INSERT INTO Booking (
+        customerID, hotelNumber, roomNumber, paymentType, 
+        checkInDate, checkOutDate, checkedOut, roomCost
+    )
+    VALUES (
+        p_customerID, p_hotelNumber, p_roomNumber, p_paymentType, 
+        p_checkInDate, p_checkOutDate, p_checkedOut, p_roomCost
+    );
+
+    -- Update the room availability to 0 (booked)
+    UPDATE HotelRoom
+    SET available = 0
+    WHERE hotelNumber = p_hotelNumber AND roomNumber = p_roomNumber;
+
+    -- Commit the transaction
+    COMMIT;
+
+    -- Optionally, return the new bookingNumber (auto-generated)
+    SELECT LAST_INSERT_ID() AS bookingNumber;
+
+END$$
+
+DELIMITER ;
+
+
+CALL AddBooking(
+    1,           
+    17,           
+    1640,         
+    'Credit Card', 
+    '2024-05-10', 
+    '2024-05-15',  
+    0,             
+    500.00        
+);
+
