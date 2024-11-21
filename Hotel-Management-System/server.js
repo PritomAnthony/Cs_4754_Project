@@ -63,7 +63,7 @@ app.get('/checkCustomer', (req, res) => {
     return res.status(400).send('Please provide firstName, lastName, and postalCode.');
   }
 
-  // find the addressID
+  // Find the addressID
   connection.query(
     'SELECT addressID FROM Address WHERE postalCode = ?',
     [trimmedPostalCode],
@@ -77,25 +77,59 @@ app.get('/checkCustomer', (req, res) => {
         return res.status(404).send('No address found for the provided postal code.');
       }
 
-      const addressID = addressResults[0].addressID;
+      const addressID = addressResults[0].addressID;                                    // we get the addressID for the given postal code from "Address" table
+
+      // Check if the customer exists
       connection.query(
-        'SELECT customerID FROM customer WHERE firstName = ? AND lastName = ? AND addressID = ?',
+        'SELECT customerID FROM Customer WHERE firstName = ? AND lastName = ? AND addressID = ?',
         [trimmedFirstName, trimmedLastName, addressID],
         (err, customerResults) => {
-
           if (err) {
             console.error('Error fetching customer:', err);
             return res.status(500).send('Error fetching customer data.');
           }
-          else if (customerResults.length > 0) {
-            res.json({ customerID: customerResults[0].customerID });
+
+          if (customerResults.length > 0) {                                                 // Customer exists
+            return res.json({ 
+              customerID: newCustomerID,
+              message: `The customer already existed, their customerID is : ${newCustomerID}` 
+            });
           } 
-          else {
-            res.status(404).send('Customer not found.');
+          else {                                                                          // Customer does not exist, add that customer
+            connection.query(
+              'SELECT MAX(customerID) AS maxCustomerID FROM Customer',
+              (err, maxIDResult) => {
+                if (err) {
+                  console.error('Error fetching maximum customerID:', err);
+                  return res.status(500).send('Error fetching customerID.');
+                }
+
+                const newCustomerID = (maxIDResult[0].maxCustomerID || 0) + 1;               // need new customer ID so we increment the last customerID to get new one
+                const loyaltyPts = 0;                                                        // new  customer's loyalty points will be 0
+
+
+                // Insert new customer
+                connection.query(
+                  'INSERT INTO Customer (customerID, firstName, lastName, addressID, loyaltyPts) VALUES (?, ?, ?, ?, ?)',
+                  [newCustomerID, trimmedFirstName, trimmedLastName, addressID, loyaltyPts],
+                  (err, insertResult) => {
+                    if (err) {
+                      console.error('Error adding new customer:', err);
+                      return res.status(500).send('Error adding new customer.');
+                    }
+
+    
+                    res.json({                                                       // upon successful registration
+                      customerID: newCustomerID,
+                      message: `The customer is new, so added with customerID: ${newCustomerID}`
+                    });
+                  });
+              });
           }
         });
     });
 });
+
 
 
 
