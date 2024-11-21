@@ -14,6 +14,26 @@
         <h3>Top 5 hotels based on number of bookings:</h3>
         <div id="top-hotels-list"></div>
     </div>
+
+    <div id="customer-search"> 
+        <h3>Check for existing customer:</h3>
+        <label for="first-name">First Name:</label>
+        <input type="text" id="first-name" placeholder="Enter First Name">
+        <label for="last-name">Last Name:</label>
+        <input type="text" id="last-name" placeholder="Enter Last Name">
+        <label for="post-code">Postal code:</label>
+        <input type="text" id="post-code" placeholder="Enter Postal Code">
+        <button id="search-customer-btn">Search Customer</button>
+    </div>
+    
+    <div id="customer-registration" style="display:none;">
+        <h3>Customer Registration:</h3>
+        <label for="reg-first-name">First Name:</label>
+        <input type="text" id="reg-first-name">
+        <label for="reg-last-name">Last Name:</label>
+        <input type="text" id="reg-last-name">
+        <button id="register-customer-btn">Register Customer</button>
+    </div>
     <div id="create-booking">
         <h3>Create a booking:</h3>
         <label for="check-in-date">Check in date:</label>
@@ -26,6 +46,7 @@
 
     <script src="scripts/hotel.js"></script>
     <script src="scripts/tophotels.js"></script>
+    <script src="scripts/searchCustomer.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const clearButton = document.getElementById('clear-btn');
