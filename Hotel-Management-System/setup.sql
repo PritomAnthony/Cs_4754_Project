@@ -1,3 +1,5 @@
+
+
 CREATE DATABASE IF NOT EXISTS hotelManagement;
 use hotelManagement;
 
@@ -300,31 +302,6 @@ BEGIN
 
 END$$
 DELIMITER ;
-
--- testing AddBooking 
-CALL AddBooking(
-    1,           
-    17,           
-    1640,         
-    'Credit Card', 
-    '2024-05-10', 
-    '2024-05-15',  
-    0,             
-    500.00        
-);
-
-CALL AddBooking(
-    1,           
-    17,           
-    1640,         
-    'paypal', 
-    '2024-05-10', 
-    '2024-05-15',  
-    0,             
-    600.00        
-);
-
-
 
 
 
