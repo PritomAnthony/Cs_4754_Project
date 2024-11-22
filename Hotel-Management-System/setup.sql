@@ -1,3 +1,5 @@
+
+
 CREATE DATABASE IF NOT EXISTS hotelManagement;
 use hotelManagement;
 
@@ -219,25 +221,6 @@ ORDER BY checkInDate;
  
  -- ################  Triggers  ##################
  
--- Trigger to check before booking is a room is available
-DELIMITER $$
-CREATE TRIGGER before_booking_insert
-BEFORE INSERT ON Booking
-FOR EACH ROW
-BEGIN
-    DECLARE room_status INT;
-    SELECT available INTO room_status
-    FROM HotelRoom
-    WHERE roomNumber = NEW.roomNumber AND hotelNumber = NEW.hotelNumber;
-
-    -- If the room is not available, throw an error
-    IF room_status = 0 THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Room is not available for booking.';
-    END IF;
-END$$
-DELIMITER ;
-
  -- Triger to update room availibity
  DELIMITER $$
 CREATE TRIGGER update_room_availability_after_checkout
@@ -257,6 +240,7 @@ DELIMITER ;
 
 -- ################ Transaction #################
 -- stored procedure using transaction to add new booking
+DROP PROCEDURE IF EXISTS AddBooking;
 
 DELIMITER $$
 CREATE PROCEDURE AddBooking(
@@ -279,45 +263,47 @@ BEGIN
         SET MESSAGE_TEXT = 'Transaction failed. Changes rolled back.';
     END;
 
-    -- Start transaction
+    SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;
     START TRANSACTION;
 
-    -- Insert a new booking without specifying bookingNumber (AUTO_INCREMENT will handle it)
-    INSERT INTO Booking (
-        customerID, hotelNumber, roomNumber, paymentType, 
-        checkInDate, checkOutDate, checkedOut, roomCost
-    )
-    VALUES (
-        p_customerID, p_hotelNumber, p_roomNumber, p_paymentType, 
-        p_checkInDate, p_checkOutDate, p_checkedOut, p_roomCost
-    );
+    SELECT available 
+    FROM HotelRoom
+    WHERE hotelNumber = p_hotelNumber AND roomNumber = p_roomNumber
+    FOR UPDATE;
 
-    -- Update the room availability to 0 (booked)
-    UPDATE HotelRoom
-    SET available = 0
-    WHERE hotelNumber = p_hotelNumber AND roomNumber = p_roomNumber;
+    -- check if the room is available
+    IF (SELECT available 
+        FROM HotelRoom 
+        WHERE hotelNumber = p_hotelNumber AND roomNumber = p_roomNumber) = 0 THEN
+        ROLLBACK;
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Room is not available for booking.';
+    ELSE
+        -- Insert a new booking
+        INSERT INTO Booking (
+            customerID, hotelNumber, roomNumber, paymentType, 
+            checkInDate, checkOutDate, checkedOut, roomCost
+        )
+        VALUES (
+            p_customerID, p_hotelNumber, p_roomNumber, p_paymentType, 
+            p_checkInDate, p_checkOutDate, p_checkedOut, p_roomCost
+        );
 
-    -- Commit the transaction
+        -- Update the room availability to 0 (booked)
+        UPDATE HotelRoom
+        SET available = 0
+        WHERE hotelNumber = p_hotelNumber AND roomNumber = p_roomNumber;
+    END IF;
+
     COMMIT;
 
     -- Optionally, return the new bookingNumber (auto-generated)
     SELECT LAST_INSERT_ID() AS bookingNumber;
 
 END$$
-
 DELIMITER ;
 
 
-CALL AddBooking(
-    1,           
-    17,           
-    1640,         
-    'Credit Card', 
-    '2024-05-10', 
-    '2024-05-15',  
-    0,             
-    500.00        
-);
 
 -- VIEW THAT SHOWS ALL BOOKINGS FOR A PARTICULAR DATE
 CREATE OR REPLACE VIEW bookings_today (Hotel_Number, Booking_Number, Room_Number, Check_Out_Date) AS
