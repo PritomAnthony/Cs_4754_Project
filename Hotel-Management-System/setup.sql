@@ -219,25 +219,6 @@ ORDER BY checkInDate;
  
  -- ################  Triggers  ##################
  
--- Trigger to check before booking is a room is available
-DELIMITER $$
-CREATE TRIGGER before_booking_insert
-BEFORE INSERT ON Booking
-FOR EACH ROW
-BEGIN
-    DECLARE room_status INT;
-    SELECT available INTO room_status
-    FROM HotelRoom
-    WHERE roomNumber = NEW.roomNumber AND hotelNumber = NEW.hotelNumber;
-
-    -- If the room is not available, throw an error
-    IF room_status = 0 THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Room is not available for booking.';
-    END IF;
-END$$
-DELIMITER ;
-
  -- Triger to update room availibity
  DELIMITER $$
 CREATE TRIGGER update_room_availability_after_checkout
@@ -257,6 +238,7 @@ DELIMITER ;
 
 -- ################ Transaction #################
 -- stored procedure using transaction to add new booking
+DROP PROCEDURE IF EXISTS AddBooking;
 
 DELIMITER $$
 CREATE PROCEDURE AddBooking(
@@ -319,8 +301,7 @@ BEGIN
 END$$
 DELIMITER ;
 
-
-
+-- testing AddBooking 
 CALL AddBooking(
     1,           
     17,           
@@ -331,6 +312,21 @@ CALL AddBooking(
     0,             
     500.00        
 );
+
+CALL AddBooking(
+    1,           
+    17,           
+    1640,         
+    'paypal', 
+    '2024-05-10', 
+    '2024-05-15',  
+    0,             
+    600.00        
+);
+
+
+
+
 
 -- VIEW THAT SHOWS ALL BOOKINGS FOR A PARTICULAR DATE
 CREATE OR REPLACE VIEW bookings_today (Hotel_Number, Booking_Number, Room_Number, Check_Out_Date) AS
