@@ -11,6 +11,14 @@ const connection = mysql.createConnection({
   database: 'hotelmanagement'
 });
 
+connection.connect((err) => {
+  if (err) {
+    console.error('Error connecting to the database: ' + err.stack);
+    return;
+  }
+  console.log('Connected to the database with ID ' + connection.threadId);
+});
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/', (req, res) => {
@@ -41,6 +49,80 @@ app.get('/topHotels', (req, res) => {
     res.json(results);
   });
 });
+
+
+// Try this in  route with this =  First name  = Michael , last name =  Alexander  postal code = L4A4L8
+app.get('/checkCustomer', (req, res) => {
+  const { firstName, lastName, postalCode } = req.query;
+
+  const trimmedFirstName = firstName.trim();
+  const trimmedLastName = lastName.trim();
+  const trimmedPostalCode = postalCode.trim();
+
+  if (!trimmedFirstName || !trimmedLastName || !trimmedPostalCode) {
+    return res.status(400).send('Please provide firstName, lastName, and postalCode.');
+  }
+
+  // find the addressID
+  connection.query(
+    'SELECT addressID FROM Address WHERE postalCode = ?',
+    [trimmedPostalCode],
+    (err, addressResults) => {
+      if (err) {
+        console.error('Error fetching address:', err);
+        return res.status(500).send('Error fetching address data.');
+      }
+
+      if (addressResults.length === 0) {
+        return res.status(404).send('No address found for the provided postal code.');
+      }
+
+      const addressID = addressResults[0].addressID;
+      connection.query(
+        'SELECT customerID FROM customer WHERE firstName = ? AND lastName = ? AND addressID = ?',
+        [trimmedFirstName, trimmedLastName, addressID],
+        (err, customerResults) => {
+
+          if (err) {
+            console.error('Error fetching customer:', err);
+            return res.status(500).send('Error fetching customer data.');
+          }
+          else if (customerResults.length > 0) {
+            res.json({ customerID: customerResults[0].customerID });
+          } 
+          else {
+            res.status(404).send('Customer not found.');
+          }
+        });
+    });
+});
+
+app.get('/availableRooms', (req, res) => {
+  const { hotelNumber, roomCategory } = req.query;
+
+  if (!hotelNumber || !roomCategory) {
+    return res.status(400).send('Please provide Hotel Number and Room Category.');
+  }
+
+  connection.query('CALL get_available_rooms(?, ?)', [hotelNumber, roomCategory], (err, results) => {
+    if (err) {
+      console.error('Error fetching available rooms:', err);
+      return res.status(500).json({ error: 'Database error' });
+    }
+
+    res.json(results[0])
+  });
+});
+
+// app.get('/availableRooms', (req, res) => {
+//   connection.query('', (err, results) => {
+//     if (err) {
+//       res.status(500).send('Error fetching top hotels');
+//       return;
+//     }
+//     res.json(results);
+//   });
+// });
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);

@@ -14,18 +14,56 @@
         <h3>Top 5 hotels based on number of bookings:</h3>
         <div id="top-hotels-list"></div>
     </div>
+
+    <div id="customer-search"> 
+        <h3>Check for existing customer:</h3>
+        <label for="first-name">First Name:</label>
+        <input type="text" id="first-name" placeholder="Enter First Name">
+        <label for="last-name">Last Name:</label>
+        <input type="text" id="last-name" placeholder="Enter Last Name">
+        <label for="post-code">Postal code:</label>
+        <input type="text" id="post-code" placeholder="Enter Postal Code">
+        <button id="search-customer-btn">Search Customer</button>
+    </div>
+
+    <div id="customer-registration" style="display:none;">
+        <h3>Customer Registration:</h3>
+        <label for="reg-first-name">First Name:</label>
+        <input type="text" id="reg-first-name">
+        <label for="reg-last-name">Last Name:</label>
+        <input type="text" id="reg-last-name">
+        <button id="register-customer-btn">Register Customer</button>
+    </div>
+
+    <div id="search-room">
+        <h3>Search for an available room:</h3>
+        <p>Possible room categories are 'Single room', 'Double room', 'Twin room', 'King room', 'Queen room', 'Accessible room', 'Suite' and 'Penthouse'.</p>
+        <label for="hotel-number">Hotel number (from list above):</label>
+        <input id="hotel-number">
+        <label for="room-category">Room category:</label>
+        <input id="room-category">
+        <button id="search-room-btn">Search Room</button>
+        <div id="room-list"></div>
+    </div>
     <div id="create-booking">
         <h3>Create a booking:</h3>
+        <label for="customer-id">Customer ID:</label>
+        <input id="customer-id">
         <label for="check-in-date">Check in date:</label>
         <input type="date" id="check-in-date">
         <label for="check-out-date">Check out date:</label>
         <input type="date" id="check-out-date">
         <label for="hotel-number">Hotel number (from list above):</label>
         <input id="hotel-number">
+        <label for="room-number">Room number (search for available rooms above):</label>
+        <input id="room-number">
+        
     </div>
 
     <script src="scripts/hotel.js"></script>
     <script src="scripts/tophotels.js"></script>
+    <script src="scripts/searchCustomer.js"></script>
+    <script src="scripts/searchRoom.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const clearButton = document.getElementById('clear-btn');
