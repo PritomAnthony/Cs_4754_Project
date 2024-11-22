@@ -362,10 +362,10 @@ SET @total_fees = 0;
 
 CALL generateBill(325, @total_fees);
 
-DROP FUNCTION IF EXISTS get_available_rooms;
-
+DROP FUNCTION IF EXISTS get_available_room_count;
+DELIMITER //
 -- FUNCTION THAT RETURNS THE NUMBER OF AVAILABLE ROOMS GIVEN THE HOTEL NUMBER AND CATEGORY NAME (i.e. 'Single room')
-CREATE FUNCTION get_available_rooms(hotel_number INT, category_name CHAR(100))
+CREATE FUNCTION get_available_room_count(hotel_number INT, category_name CHAR(100))
 RETURNS INT DETERMINISTIC
 BEGIN
 	
@@ -388,3 +388,22 @@ BEGIN
 END //
 
 -- SELECT get_available_rooms(4, 'Single room');
+
+DROP PROCEDURE IF EXISTS get_available_rooms;
+DELIMITER //
+CREATE PROCEDURE get_available_rooms(hotel_number INT, category_name CHAR(100))
+BEGIN
+    DECLARE category_num INT;
+
+    SELECT categoryNumber INTO category_num
+    FROM RoomCategory
+    WHERE category = category_name;
+
+    SELECT roomNumber
+    FROM HotelRoom H
+    WHERE H.hotelNumber = hotel_number
+      AND H.available IS TRUE
+      AND H.categoryNumber = category_num;
+END //
+
+DELIMITER ;
