@@ -25,6 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             })
             .catch(error => {
+                
                 alert(`Error: ${error.message}`);
             });
     });

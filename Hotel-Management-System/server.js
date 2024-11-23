@@ -6,7 +6,7 @@ const path = require('path');
 
 const connection = mysql.createConnection({
   host: 'localhost',
-  user: 'admin',
+  user: 'root',
   password: 'abcd1234',
   database: 'hotelmanagement'
 });
@@ -51,52 +51,6 @@ app.get('/topHotels', (req, res) => {
 });
 
 
-// Try this in  route with this =  First name  = Michael , last name =  Alexander  postal code = L4A4L8
-app.get('/checkCustomer', (req, res) => {
-  const { firstName, lastName, postalCode } = req.query;
-
-  const trimmedFirstName = firstName.trim();
-  const trimmedLastName = lastName.trim();
-  const trimmedPostalCode = postalCode.trim();
-
-  if (!trimmedFirstName || !trimmedLastName || !trimmedPostalCode) {
-    return res.status(400).send('Please provide firstName, lastName, and postalCode.');
-  }
-
-  // find the addressID
-  connection.query(
-    'SELECT addressID FROM Address WHERE postalCode = ?',
-    [trimmedPostalCode],
-    (err, addressResults) => {
-      if (err) {
-        console.error('Error fetching address:', err);
-        return res.status(500).send('Error fetching address data.');
-      }
-
-      if (addressResults.length === 0) {
-        return res.status(404).send('No address found for the provided postal code.');
-      }
-
-      const addressID = addressResults[0].addressID;
-      connection.query(
-        'SELECT customerID FROM customer WHERE firstName = ? AND lastName = ? AND addressID = ?',
-        [trimmedFirstName, trimmedLastName, addressID],
-        (err, customerResults) => {
-
-          if (err) {
-            console.error('Error fetching customer:', err);
-            return res.status(500).send('Error fetching customer data.');
-          }
-          else if (customerResults.length > 0) {
-            res.json({ customerID: customerResults[0].customerID });
-          } 
-          else {
-            res.status(404).send('Customer not found.');
-          }
-        });
-    });
-});
-
 app.get('/availableRooms', (req, res) => {
   const { hotelNumber, roomCategory } = req.query;
 
@@ -121,7 +75,7 @@ app.get('/checkCustomer', (req, res) => {
   const trimmedFirstName = firstName.trim();
   const trimmedLastName = lastName.trim();
   const trimmedPostalCode = postalCode.trim();
-
+  
   if (!trimmedFirstName || !trimmedLastName || !trimmedPostalCode) {
     return res.status(400).send('Please provide firstName, lastName, and postalCode.');
   }
@@ -141,7 +95,6 @@ app.get('/checkCustomer', (req, res) => {
       }
 
       const addressID = addressResults[0].addressID;                                    // we get the addressID for the given postal code from "Address" table
-
       // Check if the customer exists
       connection.query(
         'SELECT customerID FROM Customer WHERE firstName = ? AND lastName = ? AND addressID = ?',
@@ -154,8 +107,8 @@ app.get('/checkCustomer', (req, res) => {
 
           if (customerResults.length > 0) {                                                 // Customer exists
             return res.json({ 
-              customerID: newCustomerID,
-              message: `The customer already existed, their customerID is : ${newCustomerID}` 
+              customerID: customerResults[0].customerID,
+              message: `The customer already existed, their customerID is : ${customerResults[0].customerID}` 
             });
           } 
           else {                                                                          // Customer does not exist, add that customer
@@ -169,7 +122,6 @@ app.get('/checkCustomer', (req, res) => {
 
                 const newCustomerID = (maxIDResult[0].maxCustomerID || 0) + 1;               // need new customer ID so we increment the last customerID to get new one
                 const loyaltyPts = 0;                                                        // new  customer's loyalty points will be 0
-
 
                 // Insert new customer
                 connection.query(
