@@ -155,7 +155,6 @@ SET checkedOut = CASE
     ELSE NULL
 END;
 
-
 -- EMPLOYEE GOES HERE
 LOAD DATA INFILE 'C:\\ProgramData\\MySQL\\MySQL Server 8.0\\Uploads\\employees.csv'
 INTO TABLE Employee
@@ -174,7 +173,21 @@ IGNORE 1 LINES
 
 
 
- - ###########  Indexes and testing query ##############
+/*
+-- CODE TO CREATE USERS (does not need to be executed again):
+CREATE ROLE read_role;
+GRANT SELECT, SHOW VIEW ON hotelmanagement.* TO read_role;
+CREATE USER IF NOT EXISTS 'read_user' IDENTIFIED BY 'abcd1234' DEFAULT ROLE read_role;
+CREATE ROLE write_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON hotelmanagement.* TO write_role;
+CREATE USER 'write_user' IDENTIFIED BY 'abcd1234' DEFAULT ROLE write_role;
+CREATE ROLE admin_user;
+GRANT ALL ON hotelmanagement.* TO admin_user;
+CREATE USER 'admin' IDENTIFIED BY 'abcd1234' DEFAULT ROLE admin_user;
+*/
+
+
+ -- ###########  Indexes and testing query ##############
 
 CREATE INDEX idx_city_province ON Address(city, province);
 CREATE INDEX idx_postal_code ON Address(postalCode);
@@ -217,12 +230,30 @@ ORDER BY checkInDate;
  
  CREATE INDEX idx_name ON Employee(firstName, lastName);
  CREATE INDEX idx_name ON FoodOrder(orderDate);
- 
+
  
  -- ################  Triggers  ##################
- 
+ -- Trigger to check before booking is a room is available
+DELIMITER $$
+CREATE TRIGGER before_booking_insert
+BEFORE INSERT ON Booking
+FOR EACH ROW
+BEGIN
+    DECLARE room_status INT;
+    SELECT available INTO room_status
+    FROM HotelRoom
+    WHERE roomNumber = NEW.roomNumber AND hotelNumber = NEW.hotelNumber;
+
+    -- If the room is not available, throw an error
+    IF room_status = 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Room is not available for booking.';
+    END IF;
+END$$
+DELIMITER ;
+
  -- Triger to update room availibity
- DELIMITER $$
+DELIMITER $$
 CREATE TRIGGER update_room_availability_after_checkout
 AFTER UPDATE ON booking
 FOR EACH ROW
@@ -237,6 +268,32 @@ BEGIN
 END $$
 DELIMITER ;
 
+DROP TRIGGER IF EXISTS calculate_room_cost;
+DELIMITER //
+CREATE TRIGGER calculate_room_cost
+BEFORE INSERT ON booking
+FOR EACH ROW
+BEGIN
+	DECLARE v_roomCategory VARCHAR(50);
+    DECLARE v_roomPrice DECIMAL(10, 2);
+    DECLARE v_daysBooked INT;
+
+    -- Fetch the room category
+    SELECT categoryNumber
+    INTO v_roomCategory
+    FROM HotelRoom
+    WHERE hotelNumber = NEW.hotelNumber AND roomNumber = NEW.roomNumber;
+	
+    SELECT price 
+    INTO v_roomPrice
+    FROM roomcategory
+    WHERE categoryNumber = v_roomCategory;
+
+	SET v_daysBooked = DATEDIFF(NEW.checkOutDate, NEW.checkInDate);
+    
+    SET NEW.roomCost = v_daysBooked * v_roomPrice;
+END //
+DELIMITER ;
 
 -- ################ Transaction #################
 -- stored procedure using transaction to add new booking
@@ -250,8 +307,7 @@ CREATE PROCEDURE AddBooking(
     IN p_paymentType VARCHAR(20),
     IN p_checkInDate DATE,
     IN p_checkOutDate DATE,
-    IN p_checkedOut BOOLEAN,
-    IN p_roomCost DECIMAL(10, 2)
+    IN p_checkedOut BOOLEAN
 )
 BEGIN
     -- Declare variables for error handling
@@ -282,11 +338,11 @@ BEGIN
         -- Insert a new booking
         INSERT INTO Booking (
             customerID, hotelNumber, roomNumber, paymentType, 
-            checkInDate, checkOutDate, checkedOut, roomCost
+            checkInDate, checkOutDate, checkedOut
         )
         VALUES (
             p_customerID, p_hotelNumber, p_roomNumber, p_paymentType, 
-            p_checkInDate, p_checkOutDate, p_checkedOut, p_roomCost
+            p_checkInDate, p_checkOutDate, p_checkedOut
         );
 
         -- Update the room availability to 0 (booked)

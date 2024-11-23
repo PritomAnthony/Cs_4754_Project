@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('search-room-btn').addEventListener('click', () => {
-        let hotelNumber = document.getElementById('hotel-number').value.trim();
+        let hotelNumber = document.getElementById('hotel-number-search').value.trim();
         let roomCategory = document.getElementById('room-category').value.trim();
         console.log(hotelNumber);
         console.log(roomCategory);

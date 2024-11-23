@@ -38,8 +38,8 @@
     <div id="search-room">
         <h3>Search for an available room:</h3>
         <p>Possible room categories are 'Single room', 'Double room', 'Twin room', 'King room', 'Queen room', 'Accessible room', 'Suite' and 'Penthouse'.</p>
-        <label for="hotel-number">Hotel number (from list above):</label>
-        <input id="hotel-number">
+        <label for="hotel-number-search">Hotel number (from list above):</label>
+        <input id="hotel-number-search">
         <label for="room-category">Room category:</label>
         <input id="room-category">
         <button id="search-room-btn">Search Room</button>
@@ -53,17 +53,34 @@
         <input type="date" id="check-in-date">
         <label for="check-out-date">Check out date:</label>
         <input type="date" id="check-out-date">
-        <label for="hotel-number">Hotel number (from list above):</label>
-        <input id="hotel-number">
+        <label for="hotel-number-booking">Hotel number (from list above):</label>
+        <input id="hotel-number-booking">
         <label for="room-number">Room number (search for available rooms above):</label>
         <input id="room-number">
-        
+        <label for="payment-type">Payment type:</label>
+
+        <label for="credit-card">Credit Card</label>
+        <input type="radio" id="credit-card" value="Credit Card" name="payment-type">
+        <label for="debit-card">Debit Card</label>
+        <input type="radio" id="debit-card" value="Debit Card" name="payment-type">
+        <label for="cash">Cash</label>
+        <input type="radio" id="cash" value="Cash" name="payment-type">
+        <button id="submit-booking">Submit</button>
+    </div>
+
+    <div id="delete-booking">
+        <h3>Delete a booking:</h3>
+        <label for="booking-number">Booking Number:</label>
+        <input id="booking-number">
+        <button id="delete-booking-btn">Delete</button>
     </div>
 
     <script src="scripts/hotel.js"></script>
     <script src="scripts/tophotels.js"></script>
     <script src="scripts/searchCustomer.js"></script>
     <script src="scripts/searchRoom.js"></script>
+    <script src="scripts/addBooking.js"></script>
+    <script src="scripts/deleteBooking.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const clearButton = document.getElementById('clear-btn');

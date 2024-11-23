@@ -114,16 +114,6 @@ app.get('/availableRooms', (req, res) => {
   });
 });
 
-// app.get('/availableRooms', (req, res) => {
-//   connection.query('', (err, results) => {
-//     if (err) {
-//       res.status(500).send('Error fetching top hotels');
-//       return;
-//     }
-//     res.json(results);
-//   });
-// });
-
 // Try this in  route with this =  First name  = Michael , last name =  Alexander  postal code = L4A4L8
 app.get('/checkCustomer', (req, res) => {
   const { firstName, lastName, postalCode } = req.query;
@@ -203,8 +193,42 @@ app.get('/checkCustomer', (req, res) => {
     });
 });
 
+app.post('/createBooking', (req, res) => {
+  const { customerID, hotelNumber, roomNumber, paymentType, checkInDate, checkOutDate, checkedOut } = req.body;
+
+  const query = 'INSERT INTO Booking (customerID, hotelNumber, roomNumber, paymentType, checkInDate, checkOutDate, checkedOut)\
+      VALUES (?, ?, ?, ?, ?, ?, ?)';
+
+  const values = [customerID, hotelNumber, roomNumber, paymentType, checkInDate, checkOutDate, checkedOut];
+
+  connection.query(query, values, (err, results) => {
+      if (err) {
+          console.error('Error creating booking:', err);
+          return res.status(500).json({ error: 'Database error' });
+      }
+
+      res.json({ success: true, bookingNumber: results.insertId });
+  });
+});
 
 
+// Need to deal with all tables where booking number is a foreign key
+app.delete('/deleteBooking/:bookingNumber', (req, res) => {
+  const { bookingNumber } = req.params;
+
+  connection.query('DELETE FROM Booking WHERE bookingNumber = ?', [bookingNumber], (err, results) => {
+      if (err) {
+          console.error('Error deleting booking:', err);
+          return res.status(500).json({ error: 'Database error' });
+      }
+
+      if (results.affectedRows === 0) {
+          return res.status(404).json({ success: false, message: 'Booking not found.' });
+      }
+
+      return res.json({ success: true, message: 'Booking deleted successfully.' });
+  });
+});
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
