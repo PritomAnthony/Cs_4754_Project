@@ -20,6 +20,7 @@ connection.connect((err) => {
 });
 
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.json());
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
@@ -148,19 +149,33 @@ app.get('/checkCustomer', (req, res) => {
 app.post('/createBooking', (req, res) => {
   const { customerID, hotelNumber, roomNumber, paymentType, checkInDate, checkOutDate, checkedOut } = req.body;
 
-  const query = 'INSERT INTO Booking (customerID, hotelNumber, roomNumber, paymentType, checkInDate, checkOutDate, checkedOut)\
-      VALUES (?, ?, ?, ?, ?, ?, ?)';
+  if (!customerID || !hotelNumber || !roomNumber || !checkInDate || !checkOutDate || !paymentType) {
+      return res.status(400).json({ success: false, message: 'Missing required fields' });
+  }
 
-  const values = [customerID, hotelNumber, roomNumber, paymentType, checkInDate, checkOutDate, checkedOut];
+  
+  // Prepare the stored procedure call
+  // const results = "CALL AddBooking(665, 5, 408, 'Credit Card', '2024-11-25', '2024-11-30', 0)";
 
-  connection.query(query, values, (err, results) => {
+  connection.query(
+    "CALL AddBooking(?, ?, ?, ?, ?, ?, ?)",
+    [customerID, hotelNumber, roomNumber, paymentType, checkInDate, checkOutDate, checkedOut],
+    (err, results) => {
       if (err) {
-          console.error('Error creating booking:', err);
-          return res.status(500).json({ error: 'Database error' });
+        console.error('Error calling stored procedure:', err);
+        return res.status(500).json({ error: 'Database error' });
       }
 
-      res.json({ success: true, bookingNumber: results.insertId });
-  });
+      const bookingNumber = results[1][0]?.bookingNumber;
+      console.log('Booking Number:', bookingNumber);
+
+      if (bookingNumber) {
+        return res.json({ success: true, bookingNumber });
+      } else {
+        return res.status(500).json({ success: false, message: 'Failed to create booking' });
+      }
+    }
+  );
 });
 
 

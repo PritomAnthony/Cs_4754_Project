@@ -1,8 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('submit-booking').addEventListener('click', () => {
-        const customerID = document.getElementById('customer-id').value.trim();
-        const hotelNumber = document.getElementById('hotel-number-booking').value.trim();
-        const roomNumber = document.getElementById('room-number').value.trim();
+        const customerID = parseInt(document.getElementById('customer-id').value.trim(), 10);
+        const hotelNumber = parseInt(document.getElementById('hotel-number-booking').value.trim(), 10);
+        const roomNumber = parseInt(document.getElementById('room-number').value.trim(), 10);
         const checkInDate = document.getElementById('check-in-date').value;
         const checkOutDate = document.getElementById('check-out-date').value;
         const paymentType = document.querySelector('input[name="payment-type"]:checked').value;
@@ -19,7 +19,8 @@ document.addEventListener('DOMContentLoaded', () => {
             paymentType,
             checkInDate,
             checkOutDate,
-            checkedOut: 0  // Always 0 for now
+            checkedOut: 0
+                         // Always 0 for now
         };
         console.log('Sending booking data:', JSON.stringify(bookingData));
 
@@ -33,7 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                alert('Booking created successfully.');
+                alert(`Booking created successfully with booking id ${data.bookingNumber}`);
             } else {
                 alert('Error creating booking.');
             }
