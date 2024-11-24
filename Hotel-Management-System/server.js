@@ -207,6 +207,62 @@ app.get('/viewBooking/:bookingNumber', (req, res) => {
   });
 });
 
+app.post('/addFoodOrder', (req, res) => {
+  const { bookingNumber, price } = req.body;
+
+  if (!bookingNumber || !price) {
+      return res.status(400).json({ success: false, message: 'Missing required fields' });
+  }
+
+  connection.query(
+    "CALL add_food_order(?, ?)",
+    [bookingNumber, price],
+    (err, results) => {
+      if (err) {
+        console.error('Error calling stored procedure:', err);
+        return res.status(500).json({ error: 'Database error' });
+      }
+      const orderID = results[0][0].orderID;
+      console.log('Order ID:', orderID);
+
+      if (orderID) {
+        return res.json({ success: true, orderID });
+      } else {
+        return res.status(500).json({ success: false, message: 'Failed to create food order' });
+      }
+    }
+  );
+});
+
+app.get('/viewFoodOrder/:orderID', (req, res) => {
+  const { orderID } = req.params;
+  connection.query('SELECT * FROM foodorder WHERE orderID = ?', [orderID], (err, results) => {
+    if (err) {
+      res.status(500).send('Error fetching food order');
+      return;
+    }
+    res.json(results[0]);
+  });
+});
+
+app.delete('/deleteFoodOrder/:orderID', (req, res) => {
+  const { orderID } = req.params;
+
+  connection.query('DELETE FROM foodorder WHERE orderID = ?', [orderID], (err, results) => {
+      if (err) {
+          console.error('Error deleting food order:', err);
+          return res.status(500).json({ error: 'Database error' });
+      }
+
+      if (results.affectedRows === 0) {
+          return res.status(404).json({ success: false, message: 'Food order not found.' });
+      }
+
+      return res.json({ success: true, message: 'Food order deleted successfully.' });
+  });
+});
+
+
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });

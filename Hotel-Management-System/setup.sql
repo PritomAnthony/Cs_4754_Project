@@ -78,7 +78,7 @@ CREATE Table Employee (
 
 
 CREATE Table FoodOrder (
-    orderID INT PRIMARY KEY,
+    orderID INT AUTO_INCREMENT PRIMARY KEY,
     bookingNumber INT NOT NULL,
     price DECIMAL(10,2) NOT NULL,
     orderDate DATE NOT NULL,
@@ -382,6 +382,30 @@ END //
 
 DELIMITER ;
 
+DROP PROCEDURE IF EXISTS add_food_order;
+DELIMITER //
+CREATE PROCEDURE add_food_order(p_bookingNumber INT, p_price DECIMAL(10,2))
+BEGIN
+	DECLARE v_orderDate DATE;
+    
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        -- Rollback transaction if any error occurs
+        ROLLBACK;
+        SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = 'Transaction failed. Changes rolled back.';
+    END;
+    
+    SET v_orderDate = CURRENT_DATE();
+    
+    INSERT INTO foodorder (bookingNumber, price, orderDate)
+        VALUES (p_bookingNumber, p_price, v_orderDate);
+        
+	SELECT LAST_INSERT_ID() AS orderID;
+END //
+
+DELIMITER ;
+
 
 -- !!!!!!! IMPORTING CSV FILES INSTRUCTIONS !!!!!!!
 -- Run this 
@@ -463,4 +487,4 @@ FIELDS TERMINATED BY ','
 ENCLOSED BY '"'
 LINES TERMINATED BY '\n'
 IGNORE 1 LINES
-(orderId, bookingNumber, price, orderDate);
+(@orderId, bookingNumber, price, orderDate);

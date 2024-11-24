@@ -4,18 +4,18 @@
 </head>
 <body>
     <h1>Welcome to our Hotel Management System.</h1>
-    <div>
+    <div class="section">
         <h3>Click the button below to see the list of the hotels we service:</h3>
         <button id="hotels-btn">List of hotels</button>
         <button id="clear-btn">Clear</button>
         <div id="hotel-list"></div>
     </div>
-    <div>
+    <div class="section">
         <h3>Top 5 hotels based on number of bookings:</h3>
         <div id="top-hotels-list"></div>
     </div>
 
-    <div id="customer-search"> 
+    <div class="section" id="customer-search"> 
         <h3>Check for existing customer:</h3>
         <label for="first-name">First name:</label>
         <input type="text" id="first-name">
@@ -26,7 +26,7 @@
         <button id="search-customer-btn">Search Customer</button>
     </div>
 
-    <div id="customer-registration" style="display:none;">
+    <div class="section" id="customer-registration" style="display:none;">
         <h3>Customer Registration:</h3>
         <label for="reg-first-name">First Name:</label>
         <input type="text" id="reg-first-name">
@@ -35,7 +35,7 @@
         <button id="register-customer-btn">Register Customer</button>
     </div>
 
-    <div id="search-room">
+    <div class="section" id="search-room">
         <h3>Search for an available room:</h3>
         <p>Possible room categories are 'Single room', 'Double room', 'Twin room', 'King room', 'Queen room', 'Accessible room', 'Suite' and 'Penthouse'.</p>
         <label for="hotel-number-search">Hotel number (from list above):</label>
@@ -46,7 +46,7 @@
         <div id="room-list"></div>
     </div>
 
-    <div id="create-booking">
+    <div class="section" id="create-booking">
         <h3>Create a booking:</h3>
         <div class="row">
             <label for="customer-id">Customer ID:</label>
@@ -80,7 +80,7 @@
         </div>
     </div>
 
-    <div id="view-booking">
+    <div class="section" id="view-booking">
         <h3>View details of a booking:</h3>
         <label for="search-booking-number">Booking number:</label>
         <input id="search-booking-number">
@@ -88,11 +88,35 @@
         <div id="booking-div"></div>
     </div>
 
-    <div id="delete-booking">
+    <div class="section" id="delete-booking">
         <h3>Delete a booking:</h3>
         <label for="booking-number">Booking number:</label>
         <input id="booking-number">
         <button id="delete-booking-btn">Delete</button>
+    </div>
+
+    <div class="section" id="add-food-order">
+        <h3>Add a food order:</h3>
+        <label for="order-booking-number">Booking number:</label>
+        <input id="order-booking-number">
+        <label for="price">Price:</label>
+        <input id="price">
+        <button id="add-order-btn">Add Food Order</button>
+    </div>
+
+    <div class="section" id="view-food-order">
+        <h3>View details of a food order:</h3>
+        <label for="search-order-id">Order ID:</label>
+        <input id="search-order-id">
+        <button id="search-order-btn">Search</button>
+        <div id="order-div"></div>
+    </div>
+
+    <div class="section" id="delete-food-order">
+        <h3>Delete a food order:</h3>
+        <label for="delete-order-id">Order ID:</label>
+        <input id="delete-order-id">
+        <button id="delete-order-btn">Delete</button>
     </div>
 
     <script src="scripts/hotel.js"></script>
@@ -102,6 +126,10 @@
     <script src="scripts/addBooking.js"></script>
     <script src="scripts/deleteBooking.js"></script>
     <script src="scripts/viewBooking.js"></script>
+    <script src="scripts/addFoodOrder.js"></script>
+    <script src="scripts/viewFoodOrder.js"></script>
+    <script src="scripts/deleteFoodOrder.js"></script>
+    
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const clearButton = document.getElementById('clear-btn');
