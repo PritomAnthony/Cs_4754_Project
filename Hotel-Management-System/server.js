@@ -6,7 +6,7 @@ const path = require('path');
 
 const connection = mysql.createConnection({
   host: 'localhost',
-  user: 'root',
+  user: 'admin',
   password: 'abcd1234',
   database: 'hotelmanagement'
 });
@@ -179,7 +179,6 @@ app.post('/createBooking', (req, res) => {
 });
 
 
-// Need to deal with all tables where booking number is a foreign key
 app.delete('/deleteBooking/:bookingNumber', (req, res) => {
   const { bookingNumber } = req.params;
 
@@ -194,6 +193,17 @@ app.delete('/deleteBooking/:bookingNumber', (req, res) => {
       }
 
       return res.json({ success: true, message: 'Booking deleted successfully.' });
+  });
+});
+
+app.get('/viewBooking/:bookingNumber', (req, res) => {
+  const { bookingNumber } = req.params;
+  connection.query('SELECT * FROM booking WHERE bookingNumber = ?', [bookingNumber], (err, results) => {
+    if (err) {
+      res.status(500).send('Error fetching booking');
+      return;
+    }
+    res.json(results[0]);
   });
 });
 

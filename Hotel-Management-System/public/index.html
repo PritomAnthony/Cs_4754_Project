@@ -5,7 +5,7 @@
 <body>
     <h1>Welcome to our Hotel Management System.</h1>
     <div>
-        <h3>Click the button below to see the list of the hotels we service.</h3>
+        <h3>Click the button below to see the list of the hotels we service:</h3>
         <button id="hotels-btn">List of hotels</button>
         <button id="clear-btn">Clear</button>
         <div id="hotel-list"></div>
@@ -75,12 +75,21 @@
         <button id="delete-booking-btn">Delete</button>
     </div>
 
+    <div id="view-booking">
+        <h3>View details of a booking:</h3>
+        <label for="search-booking-number">Booking Number:</label>
+        <input id="search-booking-number">
+        <button id="search-booking-btn">Search</button>
+        <div id="booking-div"></div>
+    </div>
+
     <script src="scripts/hotel.js"></script>
     <script src="scripts/tophotels.js"></script>
     <script src="scripts/searchCustomer.js"></script>
     <script src="scripts/searchRoom.js"></script>
     <script src="scripts/addBooking.js"></script>
     <script src="scripts/deleteBooking.js"></script>
+    <script src="scripts/viewBooking.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const clearButton = document.getElementById('clear-btn');

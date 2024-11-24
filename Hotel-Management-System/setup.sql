@@ -1,5 +1,3 @@
-
-
 CREATE DATABASE IF NOT EXISTS hotelManagement;
 use hotelManagement;
 
@@ -89,92 +87,12 @@ CREATE Table FoodOrder (
 
 
 
--- !!!!!!! IMPORTING CSV FILES INSTRUCTIONS !!!!!!!
--- Run this 
-SHOW VARIABLES LIKE 'secure_file_priv';
--- It will show you a folder name like this -> C:\ProgramData\MySQL\MySQL Server 8.0\Uploads\
--- You need to add the csv files to this folder and use this folder address in the code below (in the LOAD DATA INFILE part)
--- Make sure to add an extra backslash in front of the one there because you need to escape them or something
--- NOT C:\ProgramData\MySQL\MySQL Server 8.0\Uploads\
--- NEED THIS C:\\ProgramData\\MySQL\\MySQL Server 8.0\\Uploads\\
 
-LOAD DATA INFILE 'C:\\ProgramData\\MySQL\\MySQL Server 8.0\\Uploads\\address.csv'
-INTO TABLE Address
-FIELDS TERMINATED BY ',' 
-ENCLOSED BY '"'
-LINES TERMINATED BY '\n'
-IGNORE 1 LINES
-(addressID, postalCode, city, province, street);  -- Skip the header row
-
-
-LOAD DATA INFILE 'C:\\ProgramData\\MySQL\\MySQL Server 8.0\\Uploads\\customers.csv'
-INTO TABLE Customer
-FIELDS TERMINATED BY ',' 
-ENCLOSED BY '"'
-LINES TERMINATED BY '\n'
-IGNORE 1 LINES;  -- Skip the header row
-
-LOAD DATA INFILE 'C:\\ProgramData\\MySQL\\MySQL Server 8.0\\Uploads\\hotels.csv'
-INTO TABLE Hotel
-FIELDS TERMINATED BY ',' 
-ENCLOSED BY '"'
-LINES TERMINATED BY '\n'
-IGNORE 1 LINES
-(hotelNumber, hotelName, addressID);  -- Skip the header row
-
-LOAD DATA INFILE 'C:\\ProgramData\\MySQL\\MySQL Server 8.0\\Uploads\\room_categories.csv'
-INTO TABLE RoomCategory
-FIELDS TERMINATED BY ',' 
-ENCLOSED BY '"'
-LINES TERMINATED BY '\n'
-IGNORE 1 LINES;  -- Skip the header row
-
-LOAD DATA INFILE 'C:\\ProgramData\\MySQL\\MySQL Server 8.0\\Uploads\\hotel_rooms.csv'
-INTO TABLE HotelRoom
-FIELDS TERMINATED BY ',' 
-ENCLOSED BY '"'
-LINES TERMINATED BY '\n'
-IGNORE 1 LINES
-(roomNumber, hotelNumber, @available, categoryNumber)
-SET available = CASE
-    WHEN @available = 'True' THEN 1
-    WHEN @available = 'False' THEN 0
-    ELSE NULL
-END;  -- Skip the header row
-
-LOAD DATA INFILE 'C:\\ProgramData\\MySQL\\MySQL Server 8.0\\Uploads\\bookings.csv'
-INTO TABLE Booking
-FIELDS TERMINATED BY ',' 
-ENCLOSED BY '"'
-LINES TERMINATED BY '\n'
-IGNORE 1 LINES
-(customerID, hotelNumber, roomNumber, paymentType, checkInDate, checkOutDate, @checkedOut, roomCost)
-SET checkedOut = CASE
-    WHEN @checkedOut = 'True' THEN 1
-    WHEN @checkedOut = 'False' THEN 0
-    ELSE NULL
-END;
-
--- EMPLOYEE GOES HERE
-LOAD DATA INFILE 'C:\\ProgramData\\MySQL\\MySQL Server 8.0\\Uploads\\employees.csv'
-INTO TABLE Employee
-FIELDS TERMINATED BY ',' 
-ENCLOSED BY '"'
-LINES TERMINATED BY '\n'
-IGNORE 1 LINES;  -- Skip the header row
-
-LOAD DATA INFILE 'C:\\ProgramData\\MySQL\\MySQL Server 8.0\\Uploads\\food_orders.csv'
-INTO TABLE FoodOrder
-FIELDS TERMINATED BY ',' 
-ENCLOSED BY '"'
-LINES TERMINATED BY '\n'
-IGNORE 1 LINES
-(orderId, bookingNumber, price, orderDate);
 
 
 
 /*
--- CODE TO CREATE USERS (does not need to be executed again):
+-- CODE TO CREATE USERS (does not need to be executed twice):
 CREATE ROLE read_role;
 GRANT SELECT, SHOW VIEW ON hotelmanagement.* TO read_role;
 CREATE USER IF NOT EXISTS 'read_user' IDENTIFIED BY 'abcd1234' DEFAULT ROLE read_role;
@@ -463,3 +381,86 @@ BEGIN
 END //
 
 DELIMITER ;
+
+
+-- !!!!!!! IMPORTING CSV FILES INSTRUCTIONS !!!!!!!
+-- Run this 
+SHOW VARIABLES LIKE 'secure_file_priv';
+-- It will show you a folder name like this -> C:\ProgramData\MySQL\MySQL Server 8.0\Uploads\
+-- You need to add the csv files to this folder and use this folder address in the code below (in the LOAD DATA INFILE part)
+-- Make sure to add an extra backslash in front of the one there because you need to escape them or something
+-- NOT C:\ProgramData\MySQL\MySQL Server 8.0\Uploads\
+-- NEED THIS C:\\ProgramData\\MySQL\\MySQL Server 8.0\\Uploads\\
+
+LOAD DATA INFILE 'C:\\ProgramData\\MySQL\\MySQL Server 8.0\\Uploads\\address.csv'
+INTO TABLE Address
+FIELDS TERMINATED BY ',' 
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 LINES
+(addressID, postalCode, city, province, street);  -- Skip the header row
+
+
+LOAD DATA INFILE 'C:\\ProgramData\\MySQL\\MySQL Server 8.0\\Uploads\\customers.csv'
+INTO TABLE Customer
+FIELDS TERMINATED BY ',' 
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 LINES;  -- Skip the header row
+
+LOAD DATA INFILE 'C:\\ProgramData\\MySQL\\MySQL Server 8.0\\Uploads\\hotels.csv'
+INTO TABLE Hotel
+FIELDS TERMINATED BY ',' 
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 LINES
+(hotelNumber, hotelName, addressID);  -- Skip the header row
+
+LOAD DATA INFILE 'C:\\ProgramData\\MySQL\\MySQL Server 8.0\\Uploads\\room_categories.csv'
+INTO TABLE RoomCategory
+FIELDS TERMINATED BY ',' 
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 LINES;  -- Skip the header row
+
+LOAD DATA INFILE 'C:\\ProgramData\\MySQL\\MySQL Server 8.0\\Uploads\\hotel_rooms.csv'
+INTO TABLE HotelRoom
+FIELDS TERMINATED BY ',' 
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 LINES
+(roomNumber, hotelNumber, @available, categoryNumber)
+SET available = CASE
+    WHEN @available = 'True' THEN 1
+    WHEN @available = 'False' THEN 0
+    ELSE NULL
+END;  -- Skip the header row
+
+LOAD DATA INFILE 'C:\\ProgramData\\MySQL\\MySQL Server 8.0\\Uploads\\bookings.csv'
+INTO TABLE Booking
+FIELDS TERMINATED BY ',' 
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 LINES
+(customerID, hotelNumber, roomNumber, paymentType, checkInDate, checkOutDate, @checkedOut, @roomCost)
+SET checkedOut = CASE
+    WHEN @checkedOut = 'True' THEN 1
+    WHEN @checkedOut = 'False' THEN 0
+    ELSE NULL
+END;
+
+-- EMPLOYEE GOES HERE
+LOAD DATA INFILE 'C:\\ProgramData\\MySQL\\MySQL Server 8.0\\Uploads\\employees.csv'
+INTO TABLE Employee
+FIELDS TERMINATED BY ',' 
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 LINES;  -- Skip the header row
+
+LOAD DATA INFILE 'C:\\ProgramData\\MySQL\\MySQL Server 8.0\\Uploads\\food_orders.csv'
+INTO TABLE FoodOrder
+FIELDS TERMINATED BY ',' 
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 LINES
+(orderId, bookingNumber, price, orderDate);
