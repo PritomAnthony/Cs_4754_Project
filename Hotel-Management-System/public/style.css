@@ -13,3 +13,18 @@ td {
     border: 1px solid black;
     padding: 5px;
 }
+
+#create-booking {
+    width: fit-content;
+}
+
+.row {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 2px;
+}
+
+.booking-input {
+    width: 150px;
+    margin-left: 15px;
+}

@@ -17,12 +17,12 @@
 
     <div id="customer-search"> 
         <h3>Check for existing customer:</h3>
-        <label for="first-name">First Name:</label>
-        <input type="text" id="first-name" placeholder="Enter First Name">
-        <label for="last-name">Last Name:</label>
-        <input type="text" id="last-name" placeholder="Enter Last Name">
+        <label for="first-name">First name:</label>
+        <input type="text" id="first-name">
+        <label for="last-name">Last name:</label>
+        <input type="text" id="last-name">
         <label for="post-code">Postal code:</label>
-        <input type="text" id="post-code" placeholder="Enter Postal Code">
+        <input type="text" id="post-code">
         <button id="search-customer-btn">Search Customer</button>
     </div>
 
@@ -45,42 +45,54 @@
         <button id="search-room-btn">Search Room</button>
         <div id="room-list"></div>
     </div>
+
     <div id="create-booking">
         <h3>Create a booking:</h3>
-        <label for="customer-id">Customer ID:</label>
-        <input id="customer-id">
-        <label for="check-in-date">Check in date:</label>
-        <input type="date" id="check-in-date">
-        <label for="check-out-date">Check out date:</label>
-        <input type="date" id="check-out-date">
-        <label for="hotel-number-booking">Hotel number (from list above):</label>
-        <input id="hotel-number-booking">
-        <label for="room-number">Room number (search for available rooms above):</label>
-        <input id="room-number">
-        <label for="payment-type">Payment type:</label>
-
-        <label for="credit-card">Credit Card</label>
-        <input type="radio" id="credit-card" value="Credit Card" name="payment-type">
-        <label for="debit-card">Debit Card</label>
-        <input type="radio" id="debit-card" value="Debit Card" name="payment-type">
-        <label for="cash">Cash</label>
-        <input type="radio" id="cash" value="Cash" name="payment-type">
-        <button id="submit-booking">Submit</button>
-    </div>
-
-    <div id="delete-booking">
-        <h3>Delete a booking:</h3>
-        <label for="booking-number">Booking Number:</label>
-        <input id="booking-number">
-        <button id="delete-booking-btn">Delete</button>
+        <div class="row">
+            <label for="customer-id">Customer ID:</label>
+            <input id="customer-id" class="booking-input">
+        </div>
+        <div class="row">
+            <label for="check-in-date">Check in date:</label>
+            <input type="date" id="check-in-date" class="booking-input">
+        </div>
+        <div class="row">
+            <label for="check-out-date">Check out date:</label>
+            <input type="date" id="check-out-date" class="booking-input">
+        </div>
+        <div class="row">
+            <label for="hotel-number-booking">Hotel number (from list above):</label>
+            <input id="hotel-number-booking" class="booking-input">
+        </div>
+        <div class="row">
+            <label for="room-number">Room number (search for available rooms above):</label>
+            <input id="room-number" class="booking-input">
+        </div>
+        <div class="row">
+            <label for="payment-type">Payment type:</label>
+            <label for="credit-card">Credit Card</label>
+            <input type="radio" id="credit-card" value="Credit Card" name="payment-type">
+            <label for="debit-card">Debit Card</label>
+            <input type="radio" id="debit-card" value="Debit Card" name="payment-type">
+            <label for="cash">Cash</label>
+            <input type="radio" id="cash" value="Cash" name="payment-type">
+            <button id="submit-booking">Submit</button>
+        </div>
     </div>
 
     <div id="view-booking">
         <h3>View details of a booking:</h3>
-        <label for="search-booking-number">Booking Number:</label>
+        <label for="search-booking-number">Booking number:</label>
         <input id="search-booking-number">
         <button id="search-booking-btn">Search</button>
         <div id="booking-div"></div>
+    </div>
+
+    <div id="delete-booking">
+        <h3>Delete a booking:</h3>
+        <label for="booking-number">Booking number:</label>
+        <input id="booking-number">
+        <button id="delete-booking-btn">Delete</button>
     </div>
 
     <script src="scripts/hotel.js"></script>
