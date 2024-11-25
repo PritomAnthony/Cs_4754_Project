@@ -119,6 +119,11 @@
         <button id="delete-order-btn">Delete</button>
     </div>
 
+    <div class="section" id="manage-employees">
+        <h3>Manage Employees:</h3>
+        <button id="manage-employees-btn">Open Employee Management</button>
+    </div>
+
     <script src="scripts/hotel.js"></script>
     <script src="scripts/tophotels.js"></script>
     <script src="scripts/searchCustomer.js"></script>
@@ -129,6 +134,7 @@
     <script src="scripts/addFoodOrder.js"></script>
     <script src="scripts/viewFoodOrder.js"></script>
     <script src="scripts/deleteFoodOrder.js"></script>
+    <script src="scripts/manageEmployees.js"></script>
     
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -143,5 +149,9 @@
         const today = new Date().toISOString().split('T')[0];
         document.getElementById('check-in-date').setAttribute('min', today);
         document.getElementById('check-out-date').setAttribute('min', today);
+
+        document.getElementById('manage-employees-btn').addEventListener('click', () => {
+        const popup = window.open('employee.html', 'Manage Employees', 'width=500,height=600');
+});
     </script>
 </body>

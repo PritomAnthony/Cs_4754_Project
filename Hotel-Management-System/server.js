@@ -6,7 +6,7 @@ const path = require('path');
 
 const connection = mysql.createConnection({
   host: 'localhost',
-  user: 'admin',
+  user: 'root',
   password: 'abcd1234',
   database: 'hotelmanagement'
 });
@@ -261,6 +261,101 @@ app.delete('/deleteFoodOrder/:orderID', (req, res) => {
       return res.json({ success: true, message: 'Food order deleted successfully.' });
   });
 });
+
+
+const getNextEmployeeId = async () => {
+  return new Promise((resolve, reject) => {
+      db.query('SELECT MAX(employeeId) AS maxId FROM Employee', (err, results) => {
+          if (err) return reject(err);
+          const nextId = (results[0].maxId || 0) + 1;
+          resolve(nextId);
+      });
+  });
+};
+
+// Add Employee
+app.post('/add-employee', async (req, res) => {
+  const { hotelNumber, firstName, lastName, department } = req.body;
+
+  if (!hotelNumber || !firstName || !lastName || !department) {
+      return res.status(400).send({ message: 'All fields are required.' });
+  }
+
+  try {
+      const nextEmployeeId = await getNextEmployeeId();
+
+      const query = 'INSERT INTO Employee (employeeId, hotelNumber, firstName, lastName, department) VALUES (?, ?, ?, ?, ?)';
+      db.query(query, [nextEmployeeId, hotelNumber, firstName, lastName, department], (err, result) => {
+          if (err) {
+              console.error(err);
+              return res.status(500).send({ message: 'Error adding employee.' });
+          }
+          res.status(200).send({ message: 'Employee added successfully!', employeeId: nextEmployeeId });
+      });
+  } catch (error) {
+      res.status(500).send({ message: 'Error fetching next employee ID.', error });
+  }
+});
+
+// Delete Employee
+app.delete('/delete-employee/:employeeId', (req, res) => {
+  const { employeeId } = req.params;
+
+  const checkQuery = 'SELECT * FROM Employee WHERE employeeId = ?';
+  db.query(checkQuery, [employeeId], (err, results) => {
+      if (err) {
+          console.error(err);
+          return res.status(500).send({ message: 'Error checking employee existence.' });
+      }
+
+      if (results.length === 0) {
+          return res.status(404).send({ message: 'Employee not found.' });
+      }
+
+      const deleteQuery = 'DELETE FROM Employee WHERE employeeId = ?';
+      db.query(deleteQuery, [employeeId], (err, result) => {
+          if (err) {
+              console.error(err);
+              return res.status(500).send({ message: 'Error deleting employee.' });
+          }
+          res.status(200).send({ message: 'Employee deleted successfully!' });
+      });
+  });
+});
+
+// Update Employee
+app.put('/update-employee', (req, res) => {
+  const { employeeId, hotelNumber, firstName, lastName, department } = req.body;
+
+  if (!employeeId || !hotelNumber || !firstName || !lastName || !department) {
+      return res.status(400).send({ message: 'All fields are required for updating.' });
+  }
+
+  const checkQuery = 'SELECT * FROM Employee WHERE employeeId = ?';
+  db.query(checkQuery, [employeeId], (err, results) => {
+      if (err) {
+          console.error(err);
+          return res.status(500).send({ message: 'Error checking employee existence.' });
+      }
+
+      if (results.length === 0) {
+          return res.status(404).send({ message: 'Employee not found.' });
+      }
+
+      const updateQuery = `
+          UPDATE Employee 
+          SET hotelNumber = ?, firstName = ?, lastName = ?, department = ? 
+          WHERE employeeId = ?`;
+      db.query(updateQuery, [hotelNumber, firstName, lastName, department, employeeId], (err, result) => {
+          if (err) {
+              console.error(err);
+              return res.status(500).send({ message: 'Error updating employee.' });
+          }
+          res.status(200).send({ message: 'Employee updated successfully!' });
+      });
+  });
+});
+
 
 
 app.listen(port, () => {
