@@ -1,18 +1,21 @@
 <head>
     <title>Hotel Management System</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body>
-    <h1>Welcome to our Hotel Management System.</h1>
-    <div class="section">
-        <h3>Click the button below to see the list of the hotels we service:</h3>
-        <button id="hotels-btn">List of hotels</button>
-        <button id="clear-btn">Clear</button>
+    <div id="header"><h1>Welcome to our Hotel Management System</h1></div>
+
+    <div id="first-grid-section">
+    <div class="section" id="hotel-list-div">
+        <h3>Click the button to see the list of the hotels we service:</h3>
+        <button id="hotels-btn">LIST</button>
+        <button id="clear-btn">CLEAR</button>
         <div id="hotel-list"></div>
     </div>
-    <div class="section">
+    <div class="section" id="top-hotels-div">
         <h3>Top 5 hotels based on number of bookings:</h3>
         <div id="top-hotels-list"></div>
+    </div>
     </div>
 
     <div class="section" id="customer-search"> 
@@ -23,29 +26,30 @@
         <input type="text" id="last-name">
         <label for="post-code">Postal code:</label>
         <input type="text" id="post-code">
-        <button id="search-customer-btn">Search Customer</button>
+        <button id="search-customer-btn">SEARCH</button>
     </div>
-
     <div class="section" id="customer-registration" style="display:none;">
         <h3>Customer Registration:</h3>
         <label for="reg-first-name">First Name:</label>
         <input type="text" id="reg-first-name">
         <label for="reg-last-name">Last Name:</label>
         <input type="text" id="reg-last-name">
-        <button id="register-customer-btn">Register Customer</button>
+        <button id="register-customer-btn">REGISTER</button>
     </div>
 
     <div class="section" id="search-room">
         <h3>Search for an available room:</h3>
-        <p>Possible room categories are 'Single room', 'Double room', 'Twin room', 'King room', 'Queen room', 'Accessible room', 'Suite' and 'Penthouse'.</p>
+        <div id="paragraph-wrapper"><p>Note: Possible room categories are 'Single room', 'Double room', 'Twin room', 'King room', 'Queen room', 'Accessible room', 'Suite' and 'Penthouse'.</p></div>
         <label for="hotel-number-search">Hotel number (from list above):</label>
         <input id="hotel-number-search">
         <label for="room-category">Room category:</label>
         <input id="room-category">
-        <button id="search-room-btn">Search Room</button>
+        <button id="search-room-btn">SEARCH</button>
         <div id="room-list"></div>
     </div>
 
+    <div id="booking-section">
+    <h2 id="bookings-header">BOOKINGS</h2>
     <div class="section" id="create-booking">
         <h3>Create a booking:</h3>
         <div class="row">
@@ -76,15 +80,15 @@
             <input type="radio" id="debit-card" value="Debit Card" name="payment-type">
             <label for="cash">Cash</label>
             <input type="radio" id="cash" value="Cash" name="payment-type">
-            <button id="submit-booking">Submit</button>
+            <button id="submit-booking">SUBMIT</button>
         </div>
     </div>
-
+    <div id="second-booking-section">
     <div class="section" id="view-booking">
         <h3>View details of a booking:</h3>
         <label for="search-booking-number">Booking number:</label>
         <input id="search-booking-number">
-        <button id="search-booking-btn">Search</button>
+        <button id="search-booking-btn">SEARCH</button>
         <div id="booking-div"></div>
     </div>
 
@@ -92,32 +96,39 @@
         <h3>Delete a booking:</h3>
         <label for="booking-number">Booking number:</label>
         <input id="booking-number">
-        <button id="delete-booking-btn">Delete</button>
+        <button id="delete-booking-btn">DELETE</button>
+    </div>
+    </div>
     </div>
 
+    <div id="food-order-section">
+    <h2>FOOD ORDERS</h2>
     <div class="section" id="add-food-order">
         <h3>Add a food order:</h3>
         <label for="order-booking-number">Booking number:</label>
         <input id="order-booking-number">
         <label for="price">Price:</label>
         <input id="price">
-        <button id="add-order-btn">Add Food Order</button>
+        <button id="add-order-btn">ADD ORDER</button>
     </div>
-
+    <div id="second-food-section">
     <div class="section" id="view-food-order">
         <h3>View details of a food order:</h3>
         <label for="search-order-id">Order ID:</label>
         <input id="search-order-id">
-        <button id="search-order-btn">Search</button>
+        <button id="search-order-btn">SEARCH</button>
         <div id="order-div"></div>
     </div>
-
+    
     <div class="section" id="delete-food-order">
         <h3>Delete a food order:</h3>
         <label for="delete-order-id">Order ID:</label>
         <input id="delete-order-id">
-        <button id="delete-order-btn">Delete</button>
+        <button id="delete-order-btn">DELETE</button>
     </div>
+    </div>
+    </div>
+    <div id="bottom-spacer"></div>
 
     <div class="section" id="manage-employees">
         <h3>Manage Employees:</h3>
