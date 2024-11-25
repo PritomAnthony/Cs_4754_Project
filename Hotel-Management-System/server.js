@@ -152,7 +152,6 @@ app.post('/createBooking', (req, res) => {
   if (!customerID || !hotelNumber || !roomNumber || !checkInDate || !checkOutDate || !paymentType) {
       return res.status(400).json({ success: false, message: 'Missing required fields' });
   }
-
   
   // Prepare the stored procedure call
   // const results = "CALL AddBooking(665, 5, 408, 'Credit Card', '2024-11-25', '2024-11-30', 0)";
