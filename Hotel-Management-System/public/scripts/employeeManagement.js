@@ -84,3 +84,59 @@ document.getElementById('update-employee-btn').addEventListener('click', () => {
         .catch(error => console.error('Error:', error));
     });
 });
+
+
+document.getElementById('get-employee-btn').addEventListener('click', () => {
+    const formContainer = document.getElementById('form-container');
+    
+    formContainer.innerHTML = `
+        <h3>Search Employee</h3>
+        <label for="employee-id">Enter Employee ID:</label>
+        <input type="text" id="employee-id" placeholder="Enter Employee ID">
+        <button id="search-employee-btn">Get Employee Details</button>
+    `
+    document.getElementById('search-employee-btn').addEventListener('click', async () => {
+        const employeeId = document.getElementById('employee-id').value.trim(); 
+
+        if (!employeeId) {
+            alert('Employee id required!');
+            return;
+        }
+        try { 
+            const response = await fetch(`/employee/${employeeId}`);
+            if (response.ok) {
+                const employeeData = await response.json(); 
+                if (employeeData) {
+                    displayEmployeeDetails(employeeData);  
+                } else {
+                    alert('Employee not found');
+                }
+            } else {
+                alert('Error fetching employee data');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('An error occurred while fetching employee details.');
+        }
+    
+    });
+});
+    
+
+function displayEmployeeDetails(employeeData) {
+    const employeeDetailsDiv = document.getElementById('form-container');
+
+    employeeDetailsDiv.innerHTML = '';
+
+    const employeeDiv = document.createElement('div');
+    employeeDiv.innerHTML = `
+        <h3>Employee Details</h3>
+        <p><strong>ID:</strong> ${employeeData.employeeId}</p>
+        <p><strong>First Name:</strong> ${employeeData.fname}</p>
+        <p><strong>Last Name:</strong> ${employeeData.lname}</p>
+        <p><strong>Works At:</strong> ${employeeData.hotelName}</p>
+        <p><strong>In Department:</strong> ${employeeData.dep}</p>
+    `;
+
+    employeeDetailsDiv.appendChild(employeeDiv);
+}
