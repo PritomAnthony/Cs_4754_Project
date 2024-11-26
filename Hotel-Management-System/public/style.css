@@ -79,7 +79,6 @@ html, body {
     border:none;
     border-radius:35px;
     font-weight:bold;
-    opacity:1;
     width:100px;
 }
 
@@ -356,6 +355,29 @@ h3 {
     background-color:rgba(74, 98, 138, 0.9);
 }
 
-#bottom-spacer {
-    height: 100px;
+#manage-employees {
+    width:90%;
+    margin:auto;
+    margin-top: 25px;
+    height:auto;
+    padding:25px;
+    font-family:Arial, Helvetica, sans-serif;
+    background-color:rgba(74, 98, 138, 0.6);
+    border-radius:15px;
+    color:white;
+}
+
+#manage-employees-btn{
+    margin-left:15px;
+    background-color:rgba(74, 98, 138, 0.8);
+    padding:15px;
+    color:white;
+    border:none;
+    border-radius:35px;
+    font-weight:bold;
+    width:300px;
+}
+
+#manage-employees-btn:hover {
+    background-color:rgba(74, 98, 138, 0.9);
 }
