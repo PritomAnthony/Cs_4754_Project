@@ -14,9 +14,10 @@
     </div>
     <div class="section" id="top-hotels-div">
         <h3>Top 5 hotels based on number of bookings:</h3>
+        <div id="top-hotels-list"></div>
     </div>
     </div>
-    
+
     <div class="section" id="customer-search"> 
         <h3>Check for existing customer:</h3>
         <label for="first-name">First name:</label>
@@ -129,6 +130,11 @@
     </div>
     <div id="bottom-spacer"></div>
 
+    <div class="section" id="manage-employees">
+        <h3>Manage Employees:</h3>
+        <button id="manage-employees-btn">OPEN EMPLOYEE MANAGEMENT</button>
+    </div>
+
     <script src="scripts/hotel.js"></script>
     <script src="scripts/tophotels.js"></script>
     <script src="scripts/searchCustomer.js"></script>
@@ -139,6 +145,7 @@
     <script src="scripts/addFoodOrder.js"></script>
     <script src="scripts/viewFoodOrder.js"></script>
     <script src="scripts/deleteFoodOrder.js"></script>
+    <script src="scripts/manageEmployees.js"></script>
     
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -153,5 +160,9 @@
         const today = new Date().toISOString().split('T')[0];
         document.getElementById('check-in-date').setAttribute('min', today);
         document.getElementById('check-out-date').setAttribute('min', today);
+
+        document.getElementById('manage-employees-btn').addEventListener('click', () => {
+        const popup = window.open('employee.html', 'Manage Employees', 'width=600,height=600' );
+});
     </script>
 </body>
