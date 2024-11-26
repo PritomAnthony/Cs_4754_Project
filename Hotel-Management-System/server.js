@@ -6,7 +6,7 @@ const path = require('path');
 
 const connection = mysql.createConnection({
   host: 'localhost',
-  user: 'admin',
+  user: 'root',
   password: 'abcd1234',
   database: 'hotelmanagement'
 });
@@ -260,6 +260,193 @@ app.delete('/deleteFoodOrder/:orderID', (req, res) => {
 
       return res.json({ success: true, message: 'Food order deleted successfully.' });
   });
+});
+
+
+const getNextEmployeeId = async () => {
+  return new Promise((resolve, reject) => {
+      connection.query('SELECT MAX(employeeId) AS maxId FROM Employee', (err, results) => {
+          if (err) return reject(err);
+          const nextId = (results[0].maxId || 0) + 1;
+          
+          resolve(nextId);
+      });
+  });
+};
+
+// Add Employee
+app.post('/add-employee', async (req, res) => {
+  const { hotelNumber, firstName, lastName, department } = req.body;
+
+  if (!hotelNumber || !firstName || !lastName || !department) {
+      return res.status(400).send({ message: 'All fields are required.' });
+  }
+  try {
+      const nextEmployeeId = await getNextEmployeeId();
+      console.log(nextEmployeeId);
+      connection.query('INSERT INTO Employee (employeeId, hotelNumber, firstName, lastName, department) VALUES (?, ?, ?, ?, ?)',
+         [nextEmployeeId, hotelNumber, firstName, lastName, department], 
+         (err, result) => {
+
+          if (err) {
+              console.error(err);
+              return res.status(500).send({ message: 'Error adding employee.' });
+          }
+          res.status(200).send({ 
+            message: `Employee added successfully with id : ${nextEmployeeId}`, 
+            employeeId: nextEmployeeId 
+          });
+
+      });
+  } catch (error) {
+      res.status(500).send({ message: 'Error fetching next employee ID.', error });
+  }
+});
+
+
+// Delete Employee
+app.delete('/delete-employee/:employeeId', (req, res) => {
+  const { employeeId } = req.params;
+
+  connection.query('SELECT firstName, hotelNumber FROM Employee WHERE employeeId = ?', [employeeId], 
+    (err, employeeResults) => {
+      if (err) {
+          console.error(err);
+          return res.status(500).send({ message: 'Error checking employee existence.' });
+      }
+      if (employeeResults.length === 0) {
+          return res.status(404).send({ message: 'Employee not found.' });
+      }
+
+      const { firstName, hotelNumber } = employeeResults[0];
+      console.log(firstName);
+      console.log(hotelNumber);
+
+      connection.query('SELECT hotelName FROM Hotel WHERE hotelNumber = ?', [hotelNumber], 
+        (err, hotelResults) => {
+          if (err) {
+              console.error(err);
+              return res.status(500).send({ message: 'Error retrieving hotel information.' });
+          }
+
+          const hotelName = hotelResults.length > 0 ? hotelResults[0].hotelName : 'an unknown hotel';
+          console.log(hotelName);
+
+          connection.query('DELETE FROM Employee WHERE employeeId = ?', [employeeId], (err) => {
+              if (err) {
+                  console.error(err);
+                  return res.status(500).send({ message: 'Error deleting employee.' });
+              }
+
+              const responseMessage = `Employee '${firstName}' with ID ${employeeId} has been deleted from ${hotelName}.`;
+              res.status(200).send({ message: responseMessage });
+          });
+      });
+  });
+});
+
+
+// Update Employee
+app.put('/update-employee', (req, res) => {
+  const { employeeId, hotelNumber, department, firstName, lastName } = req.body;
+
+  if (!employeeId) {
+    return res.status(400).send({ message: 'Employee ID is required.' });
+  }
+
+  connection.query('SELECT * FROM Employee WHERE employeeId = ?', [employeeId], 
+    (err, results) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).send({ message: 'Error checking employee existence.' });
+    }
+    
+    if (results.length === 0) {
+      return res.status(404).send({ message: 'Employee not found.' });
+    }
+
+    const updates = [                                         // optional updates
+      { field: 'hotelNumber', value: hotelNumber },
+      { field: 'department', value: department },
+      { field: 'firstName', value: firstName },
+      { field: 'lastName', value: lastName },
+    ];
+
+    const updateFields = updates
+      .filter(update => update.value !== undefined)
+      .map(update => `${update.field} = ?`);
+
+    const updateValues = updates
+      .filter(update => update.value !== undefined)
+      .map(update => update.value);
+
+
+    if (updateFields.length === 0) {
+      return res.status(400).send({ message: 'At least one field is required.' });
+    }
+
+    updateValues.push(employeeId); 
+
+    connection.query(`
+      UPDATE Employee 
+      SET ${updateFields.join(', ')} 
+      WHERE employeeId = ?`, 
+      updateValues, (err, result) => {
+
+      if (err) {
+        console.error(err);
+        return res.status(500).send({ message: 'Error updating employee.' });
+      }
+
+      res.status(200).send({ message: 'Employee updated successfully!' });
+    });
+  });
+});
+
+
+app.get('/employee/:id', (req, res) => {
+  const employeeId = req.params.id; 
+
+  connection.query(
+      'SELECT * FROM employee WHERE employeeId = ?',
+      [employeeId],(err, results) => {
+          if (err) {
+              console.error('Error querying employee data:', err);
+              return res.status(500).json({ error: 'Error fetching employee details' });
+          }
+
+          if (results.length === 0) {
+              return res.status(404).json({ error: 'Employee not found' });
+          }
+
+          const hotelNumber = results[0].hotelNumber;
+          const fname = results[0].firstName;
+          const lname = results[0].lastName;
+          const dep = results[0].department;
+
+          connection.query(
+              'SELECT hotelName FROM hotel WHERE hotelNumber = ?',
+              [hotelNumber],(err, hotelResults) => {
+                  if (err) {
+                      console.error('Error querying hotel data:', err);
+                      return res.status(500).json({ error: 'Error fetching hotel details' });
+                  }
+
+                  if (hotelResults.length === 0) {
+                      return res.status(404).json({ error: 'Hotel not found' });
+                  }
+
+                  const hotelName = hotelResults[0].hotelName;
+                  res.json({
+                      employeeId,
+                      fname,
+                      lname,
+                      hotelNumber,
+                      hotelName,
+                      dep
+                  });
+              });
+      });
 });
 
 

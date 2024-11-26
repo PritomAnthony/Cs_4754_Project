@@ -299,6 +299,8 @@ ORDER BY employeeID;
 SELECT * FROM get_employees;
 
 DROP PROCEDURE IF EXISTS generateBill;
+DROP FUNCTION IF EXISTS get_available_room_count;
+DROP PROCEDURE IF EXISTS get_available_rooms;
 
 -- STORED PROCEDURE THAT GENERATES BILL GIVEN THE BOOKING NUMBER
 -- roomCost (from Booking) + SUM(all food orders)
@@ -336,7 +338,7 @@ SET @total_fees = 0;
 
 CALL generateBill(325, @total_fees);
 
-DROP FUNCTION IF EXISTS get_available_room_count;
+
 DELIMITER //
 -- FUNCTION THAT RETURNS THE NUMBER OF AVAILABLE ROOMS GIVEN THE HOTEL NUMBER AND CATEGORY NAME (i.e. 'Single room')
 CREATE FUNCTION get_available_room_count(hotel_number INT, category_name CHAR(100))
@@ -363,7 +365,7 @@ END //
 
 -- SELECT get_available_rooms(4, 'Single room');
 
-DROP PROCEDURE IF EXISTS get_available_rooms;
+
 DELIMITER //
 CREATE PROCEDURE get_available_rooms(hotel_number INT, category_name CHAR(100))
 BEGIN
@@ -407,8 +409,7 @@ END //
 DELIMITER ;
 
 
--- !!!!!!! IMPORTING CSV FILES INSTRUCTIONS !!!!!!!
--- Run this 
+
 SHOW VARIABLES LIKE 'secure_file_priv';
 -- It will show you a folder name like this -> C:\ProgramData\MySQL\MySQL Server 8.0\Uploads\
 -- You need to add the csv files to this folder and use this folder address in the code below (in the LOAD DATA INFILE part)
@@ -430,7 +431,8 @@ INTO TABLE Customer
 FIELDS TERMINATED BY ',' 
 ENCLOSED BY '"'
 LINES TERMINATED BY '\n'
-IGNORE 1 LINES;  -- Skip the header row
+IGNORE 1 LINES
+(customerID, firstName, lastName, addressID, loyaltyPts);  -- Skip the header row
 
 LOAD DATA INFILE 'C:\\ProgramData\\MySQL\\MySQL Server 8.0\\Uploads\\hotels.csv'
 INTO TABLE Hotel
