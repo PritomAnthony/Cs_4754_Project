@@ -1,6 +1,7 @@
 # Cs_4754_Project
 Project for comp 4754
-
+## To load the dummy data, few adujustments are needed in mySQL workbench: 
+    - MySQL Workbench, go to "Edit" → "Preferences" → "SQL Editor" → "DBMS connection read time out" and increase the value to 60.
 
  - Step to Prevent Concurrent Bookings in the "AddBooking" stored procedure
     - We have set the isolation level to SERIALIZABLE for the transaction. This ensures that a transaction has exclusive access to the rows it reads until the transaction completes.

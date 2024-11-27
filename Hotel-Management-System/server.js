@@ -6,7 +6,7 @@ const path = require('path');
 
 const connection = mysql.createConnection({
   host: 'localhost',
-  user: 'admin',
+  user: 'root',
   password: 'abcd1234',
   database: 'hotelmanagement'
 });
@@ -69,82 +69,102 @@ app.get('/availableRooms', (req, res) => {
   });
 });
 
-// Try this in  route with this =  First name  = Michael , last name =  Alexander  postal code = L4A4L8
+// Try this in  route with this firstName = Laurie, lastName = Williams, telephone = 97800096955  ; this returns id 4
 app.get('/checkCustomer', (req, res) => {
-  const { firstName, lastName, postalCode } = req.query;
+  const { firstName, lastName, telephone } = req.query;
+
+  
+  const trimmedFirstName = firstName.trim();
+  const trimmedLastName = lastName.trim();
+  const trimmedTelephone = parseInt(telephone.trim());
+  console.log(trimmedFirstName, trimmedLastName, trimmedTelephone);
+  
+  // Check if the customer exists based on firstName, lastName, and telephone
+  connection.query(
+    'SELECT customerID FROM customer WHERE firstName = ? AND lastName = ? AND TelNumber = ?',
+    [trimmedFirstName, trimmedLastName, trimmedTelephone],
+    (err, customerResults) => {
+      if (err) {
+        console.error('Error fetching customer:', err);
+        return res.status(500).json({ message: 'Error fetching customer data.' });
+      }
+
+      if (customerResults.length > 0) { // Customer exists
+        console.log(customerResults)
+        return res.json({
+          customerID: customerResults[0].customerID,
+          message: `The customer already exists, their customerID is: ${customerResults[0].customerID}`
+        });
+      } else { // Customer does not exist, inform the user to register
+        return res.json({
+          message: 'No customers found with the provided details. Please register first.'
+        });
+      }
+    });
+});
+
+
+// Registration route
+app.post('/registrationCustomer', (req, res) => {
+  const { firstName, lastName, postalCode, telephone } = req.body;
 
   const trimmedFirstName = firstName.trim();
   const trimmedLastName = lastName.trim();
   const trimmedPostalCode = postalCode.trim();
-  
-  if (!trimmedFirstName || !trimmedLastName || !trimmedPostalCode) {
-    return res.status(400).send('Please provide firstName, lastName, and postalCode.');
-  }
+  const trimmedTelephone = telephone.trim();
 
-  // Find the addressID
+  console.log(trimmedPostalCode);
+
+  // Step 1: Find the addressID for the given postal code
   connection.query(
-    'SELECT addressID FROM Address WHERE postalCode = ?',
-    [trimmedPostalCode],
-    (err, addressResults) => {
-      if (err) {
-        console.error('Error fetching address:', err);
-        return res.status(500).send('Error fetching address data.');
-      }
-
-      if (addressResults.length === 0) {
-        return res.status(404).send('No address found for the provided postal code.');
-      }
-
-      const addressID = addressResults[0].addressID;                                    // we get the addressID for the given postal code from "Address" table
-      // Check if the customer exists
-      connection.query(
-        'SELECT customerID FROM Customer WHERE firstName = ? AND lastName = ? AND addressID = ?',
-        [trimmedFirstName, trimmedLastName, addressID],
-        (err, customerResults) => {
+      'SELECT addressID FROM address WHERE postalCode = ?',
+      [trimmedPostalCode],
+      (err, addressResults) => {
           if (err) {
-            console.error('Error fetching customer:', err);
-            return res.status(500).send('Error fetching customer data.');
+              console.error('Error fetching address:', err);
+              return res.status(500).send('Error fetching address data.');
           }
 
-          if (customerResults.length > 0) {                                                 // Customer exists
-            return res.json({ 
-              customerID: customerResults[0].customerID,
-              message: `The customer already existed, their customerID is : ${customerResults[0].customerID}` 
-            });
-          } 
-          else {                                                                          // Customer does not exist, add that customer
-            connection.query(
+          if (addressResults.length === 0) {
+              return res.status(404).send('No address found for the provided postal code.');
+          }
+
+          const addressID = addressResults[0].addressID;
+          console.log(addressID);
+
+          // Step 2: Generate a new customerID
+          connection.query(
               'SELECT MAX(customerID) AS maxCustomerID FROM Customer',
               (err, maxIDResult) => {
-                if (err) {
-                  console.error('Error fetching maximum customerID:', err);
-                  return res.status(500).send('Error fetching customerID.');
-                }
+                  if (err) {
+                      console.error('Error fetching maximum customerID:', err);
+                      return res.status(500).send('Error fetching customerID.');
+                  }
 
-                const newCustomerID = (maxIDResult[0].maxCustomerID || 0) + 1;               // need new customer ID so we increment the last customerID to get new one
-                const loyaltyPts = 0;                                                        // new  customer's loyalty points will be 0
+                  const newCustomerID = (maxIDResult[0].maxCustomerID || 0) + 1;
+                  const loyaltyPts = 0; // New customer's loyalty points will be 0
 
-                // Insert new customer
-                connection.query(
-                  'INSERT INTO Customer (customerID, firstName, lastName, addressID, loyaltyPts) VALUES (?, ?, ?, ?, ?)',
-                  [newCustomerID, trimmedFirstName, trimmedLastName, addressID, loyaltyPts],
-                  (err, insertResult) => {
-                    if (err) {
-                      console.error('Error adding new customer:', err);
-                      return res.status(500).send('Error adding new customer.');
-                    }
-
-    
-                    res.json({                                                       // upon successful registration
-                      customerID: newCustomerID,
-                      message: `The customer is new, so added with customerID: ${newCustomerID}`
+                  // Step 3: Insert the new customer into the database
+                  connection.query(
+                    'INSERT INTO Customer (customerID, firstName, lastName, addressID, loyaltyPts, TelNumber) VALUES (?, ?, ?, ?, ?, ?)',
+                    [newCustomerID, trimmedFirstName, trimmedLastName, addressID, loyaltyPts, trimmedTelephone],  // Pass the telephone number here
+                    (err, insertResult) => {
+                        if (err) {
+                            console.error('Error adding new customer:', err);
+                            return res.status(500).send('Error adding new customer.');
+                        }
+                
+                        res.json({
+                            customerID: newCustomerID,
+                            message: `The customer is new, so added with customerID: ${newCustomerID}`
+                        });
                     });
-                  });
+                
               });
-          }
-        });
-    });
+      });
 });
+
+
 
 app.post('/createBooking', (req, res) => {
   const { customerID, hotelNumber, roomNumber, paymentType, checkInDate, checkOutDate, checkedOut } = req.body;
