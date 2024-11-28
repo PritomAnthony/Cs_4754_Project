@@ -262,6 +262,32 @@ app.delete('/deleteFoodOrder/:orderID', (req, res) => {
   });
 });
 
+app.put('/updateFoodOrder', (req, res) => {
+  const { orderID, bookingNumber, price, orderDate } = req.body;
+
+  if (!orderID || !bookingNumber || !price || !orderDate) {
+      return res.status(400).json({ success: false, message: 'Missing required fields' });
+  }
+
+  const query = `
+      UPDATE foodorder 
+      SET bookingNumber = ?, price = ?, orderDate = ? 
+      WHERE orderID = ?`;
+
+  connection.query(query, [bookingNumber, price, orderDate, orderID], (err, results) => {
+      if (err) {
+          console.error('Error updating food order:', err);
+          return res.status(500).json({ error: 'Database error' });
+      }
+
+      if (results.affectedRows === 0) {
+          return res.status(404).json({ success: false, message: 'Food order not found.' });
+      }
+
+      return res.json({ success: true, message: 'Food order updated successfully.' });
+  });
+});
+
 
 const getNextEmployeeId = async () => {
   return new Promise((resolve, reject) => {

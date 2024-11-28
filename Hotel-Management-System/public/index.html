@@ -86,10 +86,42 @@
     <div id="second-booking-section">
     <div class="section" id="view-booking">
         <h3>View details of a booking:</h3>
-        <label for="search-booking-number">Booking number:</label>
-        <input id="search-booking-number">
+        <label for="update-booking-number">Booking number:</label>
+        <input id="update-booking-number">
+        <div id="update-booking">
+            <div class="row">
+                <label for="update-customer-id">Customer ID:</label>
+                <input id="update-customer-id" class="booking-input">
+            </div>
+            <div class="row">
+                <label for="update-check-in-date">Check in date:</label>
+                <input type="date" id="update-check-in-date" class="booking-input">
+            </div>
+            <div class="row">
+                <label for="update-check-out-date">Check out date:</label>
+                <input type="date" id="update-check-out-date" class="booking-input">
+            </div>
+            <div class="row">
+                <label for="update-hotel-number-booking">Hotel number (from list above):</label>
+                <input id="update-hotel-number-booking" class="booking-input">
+            </div>
+            <div class="row">
+                <label for="update-room-number">Room number (search for available rooms above):</label>
+                <input id="update-room-number" class="booking-input">
+            </div>
+            <div class="row">
+                <label for="update-payment-type">Payment type:</label>
+                <label for="update-credit-card">Credit Card</label>
+                <input type="radio" id="update-credit-card" value="Credit Card" name="update-payment-type">
+                <label for="update-debit-card">Debit Card</label>
+                <input type="radio" id="update-debit-card" value="Debit Card" name="update-payment-type">
+                <label for="update-cash">Cash</label>
+                <input type="radio" id="update-cash" value="Cash" name="update-payment-type">
+            </div>
+            <button id="update-booking-btn">UPDATE</button>
+        </div>
         <button id="search-booking-btn">SEARCH</button>
-        <div id="booking-div"></div>
+        <div id="update-div"></div>
     </div>
 
     <div class="section" id="delete-booking">
@@ -102,31 +134,47 @@
     </div>
 
     <div id="food-order-section">
-    <h2>FOOD ORDERS</h2>
-    <div class="section" id="add-food-order">
-        <h3>Add a food order:</h3>
-        <label for="order-booking-number">Booking number:</label>
-        <input id="order-booking-number">
-        <label for="price">Price:</label>
-        <input id="price">
-        <button id="add-order-btn">ADD ORDER</button>
-    </div>
-    <div id="second-food-section">
-    <div class="section" id="view-food-order">
-        <h3>View details of a food order:</h3>
-        <label for="search-order-id">Order ID:</label>
-        <input id="search-order-id">
-        <button id="search-order-btn">SEARCH</button>
-        <div id="order-div"></div>
-    </div>
-    
-    <div class="section" id="delete-food-order">
-        <h3>Delete a food order:</h3>
-        <label for="delete-order-id">Order ID:</label>
-        <input id="delete-order-id">
-        <button id="delete-order-btn">DELETE</button>
-    </div>
-    </div>
+        <h2>FOOD ORDERS</h2>
+        <div class="section" id="add-food-order">
+            <h3>Add a food order:</h3>
+            <label for="order-booking-number">Booking number:</label>
+            <input id="order-booking-number">
+            <label for="price">Price:</label>
+            <input id="price">
+            <button id="add-order-btn">ADD ORDER</button>
+        </div>
+        <div id="second-food-section">
+            <div class="section" id="view-food-order">
+                <h3>View or update details of a food order:</h3>
+                <label for="search-order-id">Order ID:</label>
+                <input id="search-order-id">
+                <div id="update-food-order">
+                    <div>
+                        <label for="update-order-booking-number">Booking number:</label>
+                        <input id="update-order-booking-number">
+                    </div>
+                    <div>
+                        <label for="update-order-price">Price:</label>
+                        <input id="update-order-price">
+                    </div>
+                    <div>
+                        <label for="update-order-date">Date:</label>
+                        <input id="update-order-date" placeholder="YYYY-MM-DD">
+                    </div>
+                    <button id="update-order-btn">UPDATE</button>
+                </div>
+                <button id="search-order-btn">SEARCH</button>
+                
+                <div id="order-div"></div>
+            </div>
+            
+            <div class="section" id="delete-food-order">
+                <h3>Delete a food order:</h3>
+                <label for="delete-order-id">Order ID:</label>
+                <input id="delete-order-id">
+                <button id="delete-order-btn">DELETE</button>
+            </div>
+        </div>
     </div>
     <div id="bottom-spacer"></div>
 
@@ -145,6 +193,7 @@
     <script src="scripts/addFoodOrder.js"></script>
     <script src="scripts/viewFoodOrder.js"></script>
     <script src="scripts/deleteFoodOrder.js"></script>
+    <script src="scripts/updateFoodOrder.js"></script>
     <script src="scripts/manageEmployees.js"></script>
     
     <script>
