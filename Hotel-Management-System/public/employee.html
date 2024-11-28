@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Management</title>
+    <style>
+        /* General Styles */
+        body {
+            background-color: #008b8b; /* Dark Cyan */
+            color: #fff;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        #options {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        #options button {
+            border-radius: 5px;
+            border: none;
+            margin: 5px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #005f5f; /* Slightly darker cyan */
+            color: #fff;
+            transition: background-color 0.3s ease;
+        }
+
+        #options button:hover {
+            background-color: #004040;
+        }
+
+        #form-container {
+            margin: 20px auto;
+            max-width: 400px;
+            background-color: #004d4d;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        #form-container h3 {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: none;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        input:focus {
+            outline: 2px solid #005f5f;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #005f5f;
+            color: #fff;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #004040;
+        }
+
+        #employee-details {
+            margin-top: 20px;
+            background-color: #003535;
+            padding: 15px;
+            border-radius: 5px;
+        }
+
+        #employee-details p {
+            margin: 5px 0;
+        }
+
+    </style>
+</head>
+<body>
+    <h1>Employee Management</h1>
+    <div id="options">
+        <button id="add-employee-btn">Add Employee</button>
+        <button id="delete-employee-btn">Delete Employee</button>
+        <button id="update-employee-btn">Update Employee</button>
+        <button id="get-employee-btn">Employee Details</button>
+    </div>
+
+    <div id="form-container"></div>
+
+    <script src="scripts/employeeManagement.js"></script>
+</body>
+</html>
