@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const totalFees = data.totalFees;
 
                 // Update the booking number
-                document.getElementById('booking-number').textContent = document.getElementById("generate-bill-input").value.trim();
+                document.getElementById('bill-booking-number').textContent = document.getElementById("generate-bill-input").value.trim();
 
                 // Loop through the bill details and display them in the appropriate <span> elements
                 billDetails.forEach(detail => {

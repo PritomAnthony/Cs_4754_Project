@@ -62,8 +62,8 @@ CREATE Table Booking (
     checkOutDate DATE NOT NULL,
     checkedOut BOOLEAN,
     roomCost DECIMAL(10,2),
-    FOREIGN KEY(customerID) REFERENCES Customer(customerID),
-    FOREIGN KEY(hotelNumber, roomNumber) REFERENCES HotelRoom(hotelNumber, roomNumber)
+    FOREIGN KEY(customerID) REFERENCES Customer(customerID) ON DELETE NO ACTION,
+    FOREIGN KEY(hotelNumber, roomNumber) REFERENCES HotelRoom(hotelNumber, roomNumber) ON DELETE NO ACTION
 );
 
 CREATE Table Employee (
@@ -273,6 +273,65 @@ BEGIN
 
     -- Optionally, return the new bookingNumber (auto-generated)
     SELECT LAST_INSERT_ID() AS bookingNumber;
+
+END$$
+DELIMITER ;
+
+
+DROP PROCEDURE IF EXISTS DeleteBooking;
+DELIMITER $$
+CREATE PROCEDURE DeleteBooking(
+    IN p_bookingNumber INT
+)
+BEGIN
+	DECLARE v_hotelNumber INT;
+    DECLARE v_roomNumber INT;
+    
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = 'Transaction failed. Changes rolled back.';
+    END;
+    
+    
+    
+	START TRANSACTION;
+    
+	SELECT hotelNumber, roomNumber
+    INTO v_hotelNumber, v_roomNumber
+    FROM Booking
+    WHERE bookingNumber = p_bookingNumber;
+    
+    IF FOUND_ROWS() = 0 THEN
+		SIGNAL SQLSTATE '45000'
+		SET MESSAGE_TEXT = 'Booking not found.';
+	END IF;
+    
+    UPDATE HotelRoom
+    SET available = 1
+    WHERE hotelNumber = v_hotelNumber AND roomNumber = v_roomNumber
+      AND EXISTS (
+        SELECT 1
+        FROM Booking b
+        WHERE b.hotelNumber = v_hotelNumber
+          AND b.roomNumber = v_roomNumber
+          AND b.checkInDate = (
+              SELECT MAX(checkInDate)
+              FROM Booking
+              WHERE hotelNumber = v_hotelNumber AND roomNumber = v_roomNumber
+          )
+          AND b.checkOutDate = (
+              SELECT MAX(checkOutDate)
+              FROM Booking
+              WHERE hotelNumber = v_hotelNumber AND roomNumber = v_roomNumber
+          )
+      );
+
+	DELETE FROM Booking
+    WHERE bookingNumber = p_bookingNumber;
+    
+    COMMIT;
 
 END$$
 DELIMITER ;

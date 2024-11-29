@@ -24,8 +24,8 @@
         <input type="text" id="first-name">
         <label for="last-name">Last name:</label>
         <input type="text" id="last-name">
-        <label for="post-code">Postal code:</label>
-        <input type="text" id="post-code">
+        <label for="telephone-number">Phone number:</label>
+        <input type="text" id="telephone-number">
         <button id="search-customer-btn">SEARCH</button>
     </div>
     <div class="section" id="customer-registration" style="display:none;">
@@ -103,11 +103,11 @@
             </div>
             <div class="row">
                 <label for="update-hotel-number-booking">Hotel number (from list above):</label>
-                <input id="update-hotel-number-booking" class="booking-input">
+                <input id="update-hotel-number-booking" class="booking-input" readonly>
             </div>
             <div class="row">
-                <label for="update-room-number">Room number (search for available rooms above):</label>
-                <input id="update-room-number" class="booking-input">
+                <label for="update-room-number">Room number:</label>
+                <input id="update-room-number" class="booking-input" readonly>
             </div>
             <div class="row">
                 <label for="update-payment-type">Payment type:</label>
@@ -183,6 +183,21 @@
         <button id="manage-employees-btn">OPEN EMPLOYEE MANAGEMENT</button>
     </div>
 
+    <div id="bottom-spacer"></div>
+
+    <div class="section" id="generate-bill">
+        <h3>Generate bill:</h3>
+        <label for="generate-bill-input"></label>
+        <input id="generate-bill-input" placeholder = "Booking number">
+        <button id="generate-bill-btn">GENERATE</button>
+        <div id="billDetails">
+            <p>Booking Number: <span id="bill-booking-number"></span></p>
+            <p>Room Cost: <span id="room-cost"></span></p>
+            <p>Food Cost: <span id="food-cost"></span></p>
+            <p>Total Cost: <span id="total-cost"></span></p>
+          </div>
+    </div>
+
     <script src="scripts/hotel.js"></script>
     <script src="scripts/tophotels.js"></script>
     <script src="scripts/searchCustomer.js"></script>
@@ -190,11 +205,13 @@
     <script src="scripts/addBooking.js"></script>
     <script src="scripts/deleteBooking.js"></script>
     <script src="scripts/viewBooking.js"></script>
+    <script src="scripts/updateBooking.js"></script>
     <script src="scripts/addFoodOrder.js"></script>
     <script src="scripts/viewFoodOrder.js"></script>
     <script src="scripts/deleteFoodOrder.js"></script>
     <script src="scripts/updateFoodOrder.js"></script>
     <script src="scripts/manageEmployees.js"></script>
+    <script src="scripts/generateBill.js"></script>
     
     <script>
         document.addEventListener('DOMContentLoaded', () => {

@@ -182,7 +182,7 @@ app.post('/createBooking', (req, res) => {
 app.delete('/deleteBooking/:bookingNumber', (req, res) => {
   const { bookingNumber } = req.params;
 
-  connection.query('DELETE FROM Booking WHERE bookingNumber = ?', [bookingNumber], (err, results) => {
+  connection.query('CALL DeleteBooking(?)', [bookingNumber], (err, results) => {
       if (err) {
           console.error('Error deleting booking:', err);
           return res.status(500).json({ error: 'Database error' });
@@ -285,6 +285,32 @@ app.put('/updateFoodOrder', (req, res) => {
       }
 
       return res.json({ success: true, message: 'Food order updated successfully.' });
+  });
+});
+
+app.put('/updateBooking', (req, res) => {
+  const { bookingNumber, customerID, hotelNumber, roomNumber, checkInDate, checkOutDate, paymentType } = req.body;
+
+  if (!bookingNumber || !customerID || !hotelNumber || !roomNumber || !checkInDate || !checkOutDate || !paymentType ) {
+      return res.status(400).json({ success: false, message: 'Missing required fields' });
+  }
+
+  const query = `
+      UPDATE booking 
+      SET customerID = ?, hotelNumber = ?, roomNumber = ?, checkInDate = ?, checkOutDate = ?, paymentType = ?   
+      WHERE bookingNumber = ?`;
+
+  connection.query(query, [customerID, hotelNumber, roomNumber, checkInDate, checkOutDate, paymentType, bookingNumber], (err, results) => {
+      if (err) {
+          console.error('Error updating booking:', err);
+          return res.status(500).json({ error: 'Database error' });
+      }
+
+      if (results.affectedRows === 0) {
+          return res.status(404).json({ success: false, message: 'Booking not found.' });
+      }
+
+      return res.json({ success: true, message: 'Booking updated successfully.' });
   });
 });
 

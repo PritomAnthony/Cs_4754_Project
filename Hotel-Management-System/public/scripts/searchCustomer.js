@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const firstName = document.getElementById('first-name').value.trim();
         const lastName = document.getElementById('last-name').value.trim();
         const telephoneNumber = document.getElementById('telephone-number').value.trim();
-        const postalCode = document.getElementById('postal-code').value.trim();
+        //const postalCode = document.getElementById('postal-code').value.trim();
 
         if (!firstName && !lastName && !telephoneNumber) {
             alert('Please provide at least one search parameter.');
