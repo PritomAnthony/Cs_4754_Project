@@ -62,8 +62,8 @@ CREATE Table Booking (
     checkOutDate DATE NOT NULL,
     checkedOut BOOLEAN,
     roomCost DECIMAL(10,2),
-    FOREIGN KEY(customerID) REFERENCES Customer(customerID) ON DELETE NO ACTION,
-    FOREIGN KEY(hotelNumber, roomNumber) REFERENCES HotelRoom(hotelNumber, roomNumber) ON DELETE NO ACTION
+    FOREIGN KEY(customerID) REFERENCES Customer(customerID),
+    FOREIGN KEY(hotelNumber, roomNumber) REFERENCES HotelRoom(hotelNumber, roomNumber)
 );
 
 CREATE Table Employee (
@@ -82,7 +82,7 @@ CREATE Table FoodOrder (
     bookingNumber INT NOT NULL,
     price DECIMAL(10,2) NOT NULL,
     orderDate DATE NOT NULL,
-    FOREIGN KEY(bookingNumber) REFERENCES Booking(bookingNumber)
+    FOREIGN KEY(bookingNumber) REFERENCES Booking(bookingNumber) ON DELETE CASCADE
 );
 
 
@@ -286,27 +286,11 @@ CREATE PROCEDURE DeleteBooking(
 BEGIN
 	DECLARE v_hotelNumber INT;
     DECLARE v_roomNumber INT;
-    
-    DECLARE EXIT HANDLER FOR SQLEXCEPTION
-    BEGIN
-        ROLLBACK;
-        SIGNAL SQLSTATE '45000' 
-        SET MESSAGE_TEXT = 'Transaction failed. Changes rolled back.';
-    END;
-    
-    
-    
-	START TRANSACTION;
-    
+
 	SELECT hotelNumber, roomNumber
     INTO v_hotelNumber, v_roomNumber
     FROM Booking
     WHERE bookingNumber = p_bookingNumber;
-    
-    IF FOUND_ROWS() = 0 THEN
-		SIGNAL SQLSTATE '45000'
-		SET MESSAGE_TEXT = 'Booking not found.';
-	END IF;
     
     UPDATE HotelRoom
     SET available = 1
@@ -331,7 +315,7 @@ BEGIN
 	DELETE FROM Booking
     WHERE bookingNumber = p_bookingNumber;
     
-    COMMIT;
+    SELECT ROW_COUNT() AS affectedRows;
 
 END$$
 DELIMITER ;

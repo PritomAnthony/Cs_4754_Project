@@ -207,9 +207,10 @@ app.delete('/deleteBooking/:bookingNumber', (req, res) => {
           console.error('Error deleting booking:', err);
           return res.status(500).json({ error: 'Database error' });
       }
-
-      if (results.affectedRows === 0) {
-          return res.status(404).json({ success: false, message: 'Booking not found.' });
+      
+      const affectedRows = results[0][0]?.affectedRows;
+      if (affectedRows === 0) {
+        return res.status(404).json({ success: false, message: 'Booking not found.' });
       }
 
       return res.json({ success: true, message: 'Booking deleted successfully.' });
