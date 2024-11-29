@@ -24,18 +24,25 @@
         <input type="text" id="first-name">
         <label for="last-name">Last name:</label>
         <input type="text" id="last-name">
-        <label for="telephone-number">Phone number:</label>
+        <label for="telephone-number">Telephone number:</label>
         <input type="text" id="telephone-number">
         <button id="search-customer-btn">SEARCH</button>
+        <div id ='customer-results'></div>
     </div>
-    <div class="section" id="customer-registration" style="display:none;">
-        <h3>Customer Registration:</h3>
-        <label for="reg-first-name">First Name:</label>
-        <input type="text" id="reg-first-name">
-        <label for="reg-last-name">Last Name:</label>
-        <input type="text" id="reg-last-name">
-        <button id="register-customer-btn">REGISTER</button>
-    </div>
+    <!-- Registration Form -->
+
+<div id="customer-registration" style="display:none;">
+    <h3>Register New Customer</h3>
+    <form id="registration-form">
+        <input type="text" id="first-name" placeholder="First Name" required />
+        <input type="text" id="last-name" placeholder="Last Name" required />
+        <input type="text" id="postal-code" placeholder="Postal Code" required />
+        <div id="postal-code-error" style="color: red; display: none;"></div>
+        <input type="text" id="telephone-number" placeholder="Telephone Number" required />
+        <button type="submit">Register</button>
+    </form>
+    <div id = "reg-result"></div>
+</div>
 
     <div class="section" id="search-room">
         <h3>Search for an available room:</h3>
