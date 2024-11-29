@@ -106,62 +106,63 @@ app.get('/checkCustomer', (req, res) => {
 
 // Registration route
 app.post('/registrationCustomer', (req, res) => {
-  const { firstName, lastName, postalCode, telephone } = req.body;
+  const { firstName, lastName, postalCode, telephone, street, city, province } = req.body;
 
   const trimmedFirstName = firstName.trim();
   const trimmedLastName = lastName.trim();
-  const trimmedPostalCode = postalCode.trim();
   const trimmedTelephone = telephone.trim();
+  const trimmedStreet = street.trim();
+  const trimmedCity = city.trim();
+  const trimmedProvince = province.trim();
+  const trimmedPostalCode = postalCode.trim();
 
   console.log(trimmedPostalCode);
 
-  // Step 1: Find the addressID for the given postal code
+  // Step 1: Insert the address into the address table
   connection.query(
-      'SELECT addressID FROM address WHERE postalCode = ?',
-      [trimmedPostalCode],
-      (err, addressResults) => {
+    'INSERT INTO address (postalCode, city, province, street) VALUES (?, ?, ?, ?)',
+    [trimmedPostalCode, trimmedCity, trimmedProvince, trimmedStreet],
+    (err, addressResults) => {
+      if (err) {
+        console.error('Error inserting address:', err);
+        return res.status(500).send('Error inserting address.');
+      }
+
+      const addressID = addressResults.insertId; // Get the new addressID
+      console.log('Inserted Address ID:', addressID);
+
+      // Step 2: Generate a new customerID
+      connection.query(
+        'SELECT MAX(customerID) AS maxCustomerID FROM Customer',
+        (err, maxIDResult) => {
           if (err) {
-              console.error('Error fetching address:', err);
-              return res.status(500).send('Error fetching address data.');
+            console.error('Error fetching maximum customerID:', err);
+            return res.status(500).send('Error fetching customerID.');
           }
 
-          if (addressResults.length === 0) {
-              return res.status(404).send('No address found for the provided postal code.');
-          }
+          const newCustomerID = (maxIDResult[0].maxCustomerID || 0) + 1;
+          const loyaltyPts = 0; // New customer's loyalty points will be 0
 
-          const addressID = addressResults[0].addressID;
-          console.log(addressID);
-
-          // Step 2: Generate a new customerID
+          // Step 3: Insert the new customer into the Customer table
           connection.query(
-              'SELECT MAX(customerID) AS maxCustomerID FROM Customer',
-              (err, maxIDResult) => {
-                  if (err) {
-                      console.error('Error fetching maximum customerID:', err);
-                      return res.status(500).send('Error fetching customerID.');
-                  }
+            'INSERT INTO Customer (customerID, firstName, lastName, addressID, loyaltyPts, TelNumber) VALUES (?, ?, ?, ?, ?, ?)',
+            [newCustomerID, trimmedFirstName, trimmedLastName, addressID, loyaltyPts, trimmedTelephone],
+            (err, insertResult) => {
+              if (err) {
+                console.error('Error adding new customer:', err);
+                return res.status(500).send('Error adding new customer.');
+              }
 
-                  const newCustomerID = (maxIDResult[0].maxCustomerID || 0) + 1;
-                  const loyaltyPts = 0; // New customer's loyalty points will be 0
-
-                  // Step 3: Insert the new customer into the database
-                  connection.query(
-                    'INSERT INTO Customer (customerID, firstName, lastName, addressID, loyaltyPts, TelNumber) VALUES (?, ?, ?, ?, ?, ?)',
-                    [newCustomerID, trimmedFirstName, trimmedLastName, addressID, loyaltyPts, trimmedTelephone],  // Pass the telephone number here
-                    (err, insertResult) => {
-                        if (err) {
-                            console.error('Error adding new customer:', err);
-                            return res.status(500).send('Error adding new customer.');
-                        }
-                
-                        res.json({
-                            customerID: newCustomerID,
-                            message: `The customer is new, so added with customerID: ${newCustomerID}`
-                        });
-                    });
-                
+              res.json({
+                customerID: newCustomerID,
+                message: `The customer is new, so added with customerID: ${newCustomerID}`,
               });
-      });
+            }
+          );
+        }
+      );
+    }
+  );
 });
 
 

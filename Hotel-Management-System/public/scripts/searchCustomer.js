@@ -94,15 +94,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const firstName = document.getElementById('first-name').value.trim();
         const lastName = document.getElementById('last-name').value.trim();
-        const postalCode = document.getElementById('postal-code').value.trim();
         const telephoneNumber = document.getElementById('telephone-number').value.trim();
-
+        const street = document.getElementById('street').value.trim();
+        const city = document.getElementById('city').value.trim();
+        const province = document.getElementById('province').value.trim();
+        const postalCode = document.getElementById('postal-code').value.trim();
         // Send the registration data to the backend
         const registrationData = {
             firstName: firstName,
             lastName: lastName,
-            postalCode: postalCode,
-            telephone: telephoneNumber
+            telephone: telephoneNumber,
+            street: street,
+            city: city,
+            province: province,
+            postalCode: postalCode
         };
 
         fetch('/registrationCustomer', {
