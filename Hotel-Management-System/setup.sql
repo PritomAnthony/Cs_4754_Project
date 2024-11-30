@@ -1,4 +1,3 @@
-drop database hotelmanagement;
 CREATE DATABASE IF NOT EXISTS hotelManagement;
 use hotelManagement;
 
@@ -460,7 +459,7 @@ SHOW VARIABLES LIKE 'secure_file_priv';
 -- NOT C:\ProgramData\MySQL\MySQL Server 8.0\Uploads\
 -- NEED THIS C:\\ProgramData\\MySQL\\MySQL Server 8.0\\Uploads\\
 
-LOAD DATA LOCAL INFILE './csv files/address.csv'
+LOAD DATA INFILE 'C:\\ProgramData\\MySQL\\MySQL Server 8.0\\Uploads\\address.csv'
 INTO TABLE Address
 FIELDS TERMINATED BY ',' 
 ENCLOSED BY '"'
@@ -469,7 +468,7 @@ IGNORE 1 LINES
 (addressID, postalCode, city, province, street);  -- Skip the header row
 
 
-LOAD DATA LOCAL INFILE './csv files/customers.csv'
+LOAD DATA INFILE 'C:\\ProgramData\\MySQL\\MySQL Server 8.0\\Uploads\\customers.csv'
 INTO TABLE Customer
 FIELDS TERMINATED BY ',' 
 ENCLOSED BY '"'
@@ -477,7 +476,7 @@ LINES TERMINATED BY '\n'
 IGNORE 1 LINES
 (customerID, firstName, lastName, addressID, loyaltyPts, TelNumber);  -- Skip the header row
 
-LOAD DATA LOCAL INFILE './csv files/hotels.csv'
+LOAD DATA INFILE 'C:\\ProgramData\\MySQL\\MySQL Server 8.0\\Uploads\\hotels.csv'
 INTO TABLE Hotel
 FIELDS TERMINATED BY ',' 
 ENCLOSED BY '"'

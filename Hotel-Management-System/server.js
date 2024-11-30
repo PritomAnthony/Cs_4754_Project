@@ -16,7 +16,7 @@ connection.connect((err) => {
     console.error('Error connecting to the database: ' + err.stack);
     return;
   }
-  console.log('Connected to the database with ID ' + connection.threadId);
+  console.log('Connected to the database.');
 });
 
 app.use(express.static(path.join(__dirname, 'public')));
