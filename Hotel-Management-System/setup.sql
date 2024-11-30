@@ -90,7 +90,7 @@ CREATE Table FoodOrder (
 
 
 
-/*
+
 -- CODE TO CREATE USERS (does not need to be executed twice):
 CREATE ROLE read_role;
 GRANT SELECT, SHOW VIEW ON hotelmanagement.* TO read_role;
@@ -101,7 +101,7 @@ CREATE USER 'write_user' IDENTIFIED BY 'abcd1234' DEFAULT ROLE write_role;
 CREATE ROLE admin_user;
 GRANT ALL ON hotelmanagement.* TO admin_user;
 CREATE USER 'admin' IDENTIFIED BY 'abcd1234' DEFAULT ROLE admin_user;
-*/
+
 
 
  -- ###########  Indexes and testing query ##############
