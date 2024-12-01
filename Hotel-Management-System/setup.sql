@@ -1,3 +1,10 @@
+SHOW VARIABLES LIKE 'secure_file_priv';
+-- It will show you a folder name similar to this -> C:\ProgramData\MySQL\MySQL Server 8.0\Uploads\
+-- You need to add the csv files to this folder and use this folder address in the code at the bottom of this file (in the LOAD DATA INFILE part)
+-- Make sure to add an extra backslash in front of the one there to escape it
+-- NOT C:\ProgramData\MySQL\MySQL Server 8.0\Uploads\
+-- NEED THIS C:\\ProgramData\\MySQL\\MySQL Server 8.0\\Uploads\\
+
 CREATE DATABASE IF NOT EXISTS hotelManagement;
 use hotelManagement;
 
@@ -452,13 +459,7 @@ DELIMITER ;
 
 
 
-SHOW VARIABLES LIKE 'secure_file_priv';
--- It will show you a folder name like this -> C:\ProgramData\MySQL\MySQL Server 8.0\Uploads\
--- You need to add the csv files to this folder and use this folder address in the code below (in the LOAD DATA INFILE part)
--- Make sure to add an extra backslash in front of the one there because you need to escape them or something
--- NOT C:\ProgramData\MySQL\MySQL Server 8.0\Uploads\
--- NEED THIS C:\\ProgramData\\MySQL\\MySQL Server 8.0\\Uploads\\
-
+-- READING CSV DATA
 LOAD DATA INFILE 'C:\\ProgramData\\MySQL\\MySQL Server 8.0\\Uploads\\address.csv'
 INTO TABLE Address
 FIELDS TERMINATED BY ',' 
