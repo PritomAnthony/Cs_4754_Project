@@ -121,7 +121,7 @@ FROM Address
 WHERE postalCode = 'P1S 7Y4';
 */
 
-CREATE INDEX idx_name ON Customer(firstName, lastName);
+CREATE INDEX  idx_customer_firstName_lastName ON Customer(firstName, lastName);
 /* 
 SELECT * 
 FROM Customer 
@@ -145,8 +145,8 @@ WHERE customerID = 781728
 ORDER BY checkInDate;
  */
  
- CREATE INDEX idx_name ON Employee(firstName, lastName);
- CREATE INDEX idx_name ON FoodOrder(orderDate);
+ CREATE INDEX idx_employee_firstName_lastName ON Employee(firstName, lastName);
+ CREATE INDEX idx_foodOrder_orderDate ON FoodOrder(orderDate);
 
  
  -- ################  Triggers  ##################
